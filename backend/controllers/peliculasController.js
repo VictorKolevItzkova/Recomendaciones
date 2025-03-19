@@ -1,9 +1,10 @@
-import { Op, Sequelize } from 'sequelize';
+import { cast, Op, Sequelize } from 'sequelize';
 import axios from 'axios';
 import Pelicula from "../models/peliculaModel.js";
 import Usuario from "../models/usuarioModel.js";
 import Vista from '../models/vistaModel.js';
 import Genero from '../models/generoModel.js';
+import Actor from '../models/actorModel.js';
 
 class peliculasController {
     constructor() {
@@ -78,6 +79,19 @@ class peliculasController {
                 return response.data;
             };
     
+            const fetchCreditDetails= async (movieId)=>{
+                const response = await axios.get(
+                    `https://api.themoviedb.org/3/movie/${movieId}/credits`,
+                    {
+                        headers: {
+                            accept: 'application/json',
+                            Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+                        }
+                    }
+                );
+                return response.data.cast.filter(member => member.known_for_department === "Acting");
+            }
+
             // Obtener películas de los diferentes endpoints
             for (const endpoint of endpoints) {
                 for (let page = 1; page <= totalPages; page++) {
@@ -97,6 +111,7 @@ class peliculasController {
                 if (!existe) {
                     try {
                         let movieDetails = await fetchMovieDetails(peli.id);
+                        let castDetails= await fetchCreditDetails(peli.id);
                         await delay(500)
                         const nuevaPelicula=await Pelicula.create({
                             id: peli.id,
@@ -104,8 +119,8 @@ class peliculasController {
                             title: peli.title,
                             overview: peli.overview,
                             release_date: peli.release_date,
-                            poster_path: `https://image.tmdb.org/t/p/original${peli.poster_path}`,
-                            backdrop_path: `https://image.tmdb.org/t/p/original${peli.backdrop_path}`,
+                            poster_path: peli.poster_path ? `https://image.tmdb.org/t/p/original${peli.poster_path}` : null,
+                            backdrop_path: peli.backdrop_path ? `https://image.tmdb.org/t/p/original${peli.backdrop_path}` : null,
                             duracion: movieDetails.runtime
                         });
                         if (movieDetails.genres) {
@@ -114,6 +129,20 @@ class peliculasController {
                                 if (genreRecord) {
                                     await nuevaPelicula.addGenero(genreRecord); // Asocia Pelicula y Genero a tabla PeliculaGenero
                                 }
+                            }
+                        }
+                        if(castDetails){
+                            for(const detalles of castDetails){
+                                let actor=await Actor.findByPk(detalles.id)
+
+                                if(!actor){
+                                    actor=await Actor.create({
+                                        id:detalles.id,
+                                        nombre:detalles.original_name,
+                                        imagen: detalles.profile_path ? `https://image.tmdb.org/t/p/original${detalles.profile_path}` : null
+                                    })
+                                }
+                                await nuevaPelicula.addActor(actor)
                             }
                         }
                     } catch (error) {
