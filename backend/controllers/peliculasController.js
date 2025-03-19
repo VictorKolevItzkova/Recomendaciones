@@ -46,7 +46,7 @@ class peliculasController {
     
             const endpoints = ['now_playing', 'popular', 'top_rated'];
             const peliculas = [];
-            const totalPages = 5;
+            const totalPages = 15;
     
             /* EVITA QUE BLOQUEEN LA API */
             const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -113,7 +113,6 @@ class peliculasController {
     
             // Insertar las películas en la base de datos
             for (const peli of peliculas) {
-                console.log(peliculas)
                 const existe = await Pelicula.findByPk(peli.id);
     
                 if (!existe) {
