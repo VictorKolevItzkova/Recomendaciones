@@ -76,7 +76,14 @@ class peliculasController {
                         }
                     }
                 );
-                return response.data;
+                const detalles = response.data;
+
+                // Filtrar películas con revenue 0 o duración menor a 60 minutos
+                if (detalles.runtime < 60) {
+                    return null; // Retornar null si no cumple los criterios
+                }
+        
+                return detalles;
             };
     
             const fetchCreditDetails= async (movieId)=>{
@@ -106,43 +113,46 @@ class peliculasController {
     
             // Insertar las películas en la base de datos
             for (const peli of peliculas) {
+                console.log(peliculas)
                 const existe = await Pelicula.findByPk(peli.id);
     
                 if (!existe) {
                     try {
                         let movieDetails = await fetchMovieDetails(peli.id);
-                        let castDetails= await fetchCreditDetails(peli.id);
-                        await delay(500)
-                        const nuevaPelicula=await Pelicula.create({
-                            id: peli.id,
-                            original_title: peli.original_title,
-                            title: peli.title,
-                            overview: peli.overview,
-                            release_date: peli.release_date,
-                            poster_path: peli.poster_path ? `https://image.tmdb.org/t/p/original${peli.poster_path}` : null,
-                            backdrop_path: peli.backdrop_path ? `https://image.tmdb.org/t/p/original${peli.backdrop_path}` : null,
-                            duracion: movieDetails.runtime
-                        });
-                        if (movieDetails.genres) {
-                            for (const genre of movieDetails.genres) {
-                                const genreRecord = await Genero.findOne({ where: { id: genre.id } });
-                                if (genreRecord) {
-                                    await nuevaPelicula.addGenero(genreRecord); // Asocia Pelicula y Genero a tabla PeliculaGenero
+                        if(movieDetails){
+                            let castDetails= await fetchCreditDetails(peli.id);
+                            await delay(500)
+                            const nuevaPelicula=await Pelicula.create({
+                                id: movieDetails.id,
+                                original_title: movieDetails.original_title,
+                                title: movieDetails.title,
+                                overview: movieDetails.overview,
+                                release_date: movieDetails.release_date,
+                                poster_path: movieDetails.poster_path ? `https://image.tmdb.org/t/p/original${movieDetails.poster_path}` : null,
+                                backdrop_path: movieDetails.backdrop_path ? `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` : null,
+                                duracion: movieDetails.runtime
+                            });
+                            if (movieDetails.genres) {
+                                for (const genre of movieDetails.genres) {
+                                    const genreRecord = await Genero.findOne({ where: { id: genre.id } });
+                                    if (genreRecord) {
+                                        await nuevaPelicula.addGenero(genreRecord); // Asocia Pelicula y Genero a tabla PeliculaGenero
+                                    }
                                 }
                             }
-                        }
-                        if(castDetails){
-                            for(const detalles of castDetails){
-                                let actor=await Actor.findByPk(detalles.id)
+                            if(castDetails){
+                                for(const detalles of castDetails){
+                                    let actor=await Actor.findByPk(detalles.id)
 
-                                if(!actor){
-                                    actor=await Actor.create({
-                                        id:detalles.id,
-                                        nombre:detalles.original_name,
-                                        imagen: detalles.profile_path ? `https://image.tmdb.org/t/p/original${detalles.profile_path}` : null
-                                    })
+                                    if(!actor){
+                                        actor=await Actor.create({
+                                            id:detalles.id,
+                                            nombre:detalles.original_name,
+                                            imagen: detalles.profile_path ? `https://image.tmdb.org/t/p/original${detalles.profile_path}` : null
+                                        })
+                                    }
+                                    await nuevaPelicula.addActor(actor)
                                 }
-                                await nuevaPelicula.addActor(actor)
                             }
                         }
                     } catch (error) {
@@ -212,6 +222,25 @@ class peliculasController {
                     }
                 ]
             });
+
+            if(vistas.length==0){
+                const peliculasAleatorias = await Pelicula.findAll({
+                    order: Sequelize.literal('RAND()'), // Seleccionar aleatoriamente
+                    limit: 45 // Obtener 45 películas aleatorias
+                });
+            
+                // Dividir las películas en 3 filas de 15 películas cada una
+                const filas = [];
+                for (let i = 0; i < peliculasAleatorias.length; i += 15) {
+                    filas.push(peliculasAleatorias.slice(i, i + 15));
+                }
+            
+                return res.status(200).json({
+                    "Fila 1": filas[0] || [],
+                    "Fila 2": filas[1] || [],
+                    "Fila 3": filas[2] || []
+                });
+            }
 
             const vistasConCalificacionAlta = vistas.filter(vista => vista.calificacion > 2.5);
 
