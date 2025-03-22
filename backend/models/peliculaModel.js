@@ -2,8 +2,8 @@ import { DataTypes } from "sequelize";
 import dbClient from '../config/dbClient.js'
 import Vista from "./vistaModel.js";
 import Genero from "./generoModel.js";
-import Actor from "./actorModel.js";
-
+import Credito from "./creditoModel.js";
+import PeliculaCredito from "./PeliculaCreditoModel.js";
 /* CREA TABLA pelicula */
 const Pelicula = dbClient.define('pelicula', {
     id: {
@@ -50,7 +50,7 @@ Vista.belongsTo(Pelicula,{foreignKey:'peliculaId'})
 Pelicula.belongsToMany(Genero,{through:"PeliculaGenero"})
 Genero.belongsToMany(Pelicula,{through:"PeliculaGenero"})
 
-Pelicula.belongsToMany(Actor,{through:"PeliculaActor"})
-Actor.belongsToMany(Pelicula,{through:"PeliculaActor"})
+Pelicula.belongsToMany(Credito,{through:PeliculaCredito})
+Credito.belongsToMany(Pelicula,{through:PeliculaCredito})
 
 export default Pelicula

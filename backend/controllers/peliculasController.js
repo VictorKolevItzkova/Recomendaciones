@@ -4,7 +4,7 @@ import Pelicula from "../models/peliculaModel.js";
 import Usuario from "../models/usuarioModel.js";
 import Vista from '../models/vistaModel.js';
 import Genero from '../models/generoModel.js';
-import Actor from '../models/actorModel.js';
+import Credito from '../models/creditoModel.js';
 
 class peliculasController {
     constructor() {
@@ -46,7 +46,7 @@ class peliculasController {
     
             const endpoints = ['now_playing', 'popular', 'top_rated'];
             const peliculas = [];
-            const totalPages = 15;
+            const totalPages = 10;
     
             /* EVITA QUE BLOQUEEN LA API */
             const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -99,6 +99,19 @@ class peliculasController {
                 return response.data.cast.filter(member => member.known_for_department === "Acting");
             }
 
+            const fetchCrewDetails= async (movieId)=>{
+                const response = await axios.get(
+                    `https://api.themoviedb.org/3/movie/${movieId}/credits`,
+                    {
+                        headers: {
+                            accept: 'application/json',
+                            Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+                        }
+                    }
+                );
+                return response.data.crew
+            }
+
             // Obtener películas de los diferentes endpoints
             for (const endpoint of endpoints) {
                 for (let page = 1; page <= totalPages; page++) {
@@ -120,6 +133,7 @@ class peliculasController {
                         let movieDetails = await fetchMovieDetails(peli.id);
                         if(movieDetails){
                             let castDetails= await fetchCreditDetails(peli.id);
+                            let crewDetail= await fetchCrewDetails(peli.id)
                             await delay(500)
                             const nuevaPelicula=await Pelicula.create({
                                 id: movieDetails.id,
@@ -141,16 +155,30 @@ class peliculasController {
                             }
                             if(castDetails){
                                 for(const detalles of castDetails){
-                                    let actor=await Actor.findByPk(detalles.id)
+                                    let actor=await Credito.findByPk(detalles.id)
 
                                     if(!actor){
-                                        actor=await Actor.create({
+                                        actor=await Credito.create({
                                             id:detalles.id,
                                             nombre:detalles.original_name,
                                             imagen: detalles.profile_path ? `https://image.tmdb.org/t/p/original${detalles.profile_path}` : null
                                         })
                                     }
-                                    await nuevaPelicula.addActor(actor)
+                                    await nuevaPelicula.addCredito(actor,{through: {rol:"Actor"}})
+                                }
+                            }
+                            if(crewDetail){
+                                for(const detalles of crewDetail){
+                                    let crew=await Credito.findByPk(detalles.id)
+
+                                    if(!crew){
+                                        crew=await Credito.create({
+                                            id:detalles.id,
+                                            nombre:detalles.original_name,
+                                            imagen: detalles.profile_path ? `https://image.tmdb.org/t/p/original${detalles.profile_path}` : null
+                                        })
+                                    }
+                                    await nuevaPelicula.addCredito(crew,{through: {rol:detalles.job}})
                                 }
                             }
                         }

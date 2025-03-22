@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import dbClient from '../config/dbClient.js'
 
 /* CREA TABLA genero */
-const Actor=dbClient.define('actor',{
+const Credito=dbClient.define('credito',{
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -16,4 +16,4 @@ const Actor=dbClient.define('actor',{
     }
 })
 
-export default Actor
+export default Credito

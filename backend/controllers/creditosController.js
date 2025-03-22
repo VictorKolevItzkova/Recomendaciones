@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Actor from '../models/actorModel';
+import Credito from '../models/creditoModel.js';
 
 class actoresController{
     constructor(){
@@ -8,7 +8,7 @@ class actoresController{
 
     async getAll(req,res){
         try{
-            const actores=Actor.findAll()
+            const actores=Credito.findAll()
             res.status(200).json(actores)
         }catch(e){
             res.status(500).send(e)
@@ -18,10 +18,10 @@ class actoresController{
     async getOne(req,res){
         try{
             const {id}=req.params
-            const actor= await Actor.findByPk(id)
+            const actor= await Credito.findByPk(id)
 
             if(!actor){
-                return res.status(404).json({message:"Actor no encontrado"})
+                return res.status(404).json({message:"Credito no encontrado"})
             }
             res.status(200).json(actor)
         }catch(e){
