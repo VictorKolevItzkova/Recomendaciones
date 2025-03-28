@@ -24,7 +24,10 @@ class peliculasController {
     async getOne(req,res){
         try{
             const {id}=req.params
-            const pelicula= await Pelicula.findByPk(id,{include:Genero})
+            const pelicula= await Pelicula.findByPk(id,{include:[
+                {model:Genero},
+                {model:Credito}
+            ]})
 
             if(!pelicula){
                 return res.status(404).json({message:"Pelicula no encontrado"})
@@ -236,7 +239,7 @@ class peliculasController {
         }
     }
 
-    async obtenerRecomendacion(req,res){
+    async obtenerRecomendaciones(req,res){
         try{
             const usuarioId=req.userConectado.id
             // Obtener los géneros favoritos del usuario
@@ -330,6 +333,7 @@ class peliculasController {
             res.status(500).json(e)
         }
     }
+
 }
 
 export default new peliculasController()
