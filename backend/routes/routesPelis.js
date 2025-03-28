@@ -9,5 +9,6 @@ route.get('/',peliculasController.getAll)
 route.get('/select/:id',verificarToken,peliculasController.getOne)
 route.get('/insertar',verificarToken,peliculasController.create)
 route.get('/recomendacion',verificarToken,peliculasController.obtenerRecomendaciones)
+route.get('/recomendacionDiaria',verificarToken,peliculasController.obtenerRecomendacionDiaria)
 
 export default route
