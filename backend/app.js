@@ -12,10 +12,10 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
 
 /* RUTAS */
-app.use("/usuarios",routesUsuario)
-app.use("/peliculas",routesPelis)
-app.use("/historial",routesVista)
-app.use("/generos",routesGeneros)
+app.use("/api/usuarios",routesUsuario)
+app.use("/api/peliculas",routesPelis)
+app.use("/api/historial",routesVista)
+app.use("/api/generos",routesGeneros)
 
 /* SINCRONIZAR BD Y ESCUCHAR POR PUERTO*/
 try{
