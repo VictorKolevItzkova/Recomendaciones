@@ -9,7 +9,8 @@ export function generarToken(email){
 }
 
 export async function verificarToken(req,res,next){
-    const token=req.header('Authorization')?.replace('Bearer ','')
+    //const token=req.header('Authorization')?.replace('Bearer ','')
+    const token=req.cookies.access_token
     if(!token){
         return res.status(401).json({error:"Token requerido"})
     }

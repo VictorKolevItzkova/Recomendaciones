@@ -102,7 +102,22 @@ class usuariosController{
             }
 
             const token=generarToken(email)
-            return res.status(200).json({msg:"Usuario válido",token})
+            res.cookie('access_token',token,{
+                httpOnly:true,
+                secure:process.env.NODE_ENV === "production",
+                sameSite:'Strict',
+                maxAge: 60*60*1000
+            })
+            res.status(200).json({msg:"Login Exitoso"})
+        }catch(e){
+            res.status(500).send(e)
+        }
+    }
+
+    async logout(req,res){
+        try{
+            res.clearCookie('access_token');
+            res.json({message:'Logout exitoso'})
         }catch(e){
             res.status(500).send(e)
         }

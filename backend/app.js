@@ -6,10 +6,14 @@ import routesPelis from './routes/routesPelis.js'
 import routesVista from './routes/routesVista.js'
 import routesGeneros from './routes/routesGenero.js';
 import dbClient from "./config/dbClient.js"
+import cors from 'cors'
+import cookieParser from 'cookie-parser';
 
 const app=express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
+app.use(cors())
+app.use(cookieParser())
 
 /* RUTAS */
 app.use("/api/usuarios",routesUsuario)
