@@ -7,6 +7,8 @@ const route=express.Router()
 route.get('/',verificarToken,usuarioController.getAll)
 route.post('/registrar',usuarioController.registro)
 route.post('/login',usuarioController.login)
+route.post('/logout',verificarToken,usuarioController.logout)
+route.get('/me',verificarToken,usuarioController.me)
 route.put('/admin/:id',verificarToken,usuarioController.setAdmin)
 
 

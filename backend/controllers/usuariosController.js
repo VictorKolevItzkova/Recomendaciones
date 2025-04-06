@@ -122,6 +122,20 @@ class usuariosController{
             res.status(500).send(e)
         }
     }
+
+    async me(req,res){
+        try{
+            if(!req.userConectado){
+                return res.status(401).json({message:'Acceso Denegado'})
+            }
+            const {id,nombre,email,rol} = req.userConectado
+
+            res.json({id,nombre,email,rol})
+        }catch(e){
+            res.status(401).json({message:'Token invalido'})
+        }
+        
+    }
 }
 
 export default new usuariosController()
