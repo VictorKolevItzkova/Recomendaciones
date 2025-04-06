@@ -1,6 +1,6 @@
 import Usuario from '../models/usuarioModel.js'
 import bcrypt from 'bcrypt'
-import { generarToken } from '../helpers/authentication.js'
+import { generarToken, refrescarToken } from '../helpers/authentication.js'
 class usuariosController{
     constructor(){}
 
@@ -101,14 +101,15 @@ class usuariosController{
                 return res.status(400).json({error:"Password no válido"})
             }
 
-            const token=generarToken(email)
-            res.cookie('access_token',token,{
+            const accessToken=generarToken(email)
+            const refreshToken=refrescarToken(email)
+            res.cookie('refreshToken',refreshToken,{
                 httpOnly:true,
                 secure:process.env.NODE_ENV === "production",
                 sameSite:'Strict',
-                maxAge: 60*60*1000
+                maxAge: 7 * 24 * 60 * 60 * 1000
             })
-            res.status(200).json({msg:"Login Exitoso"})
+            res.status(200).json(accessToken)
         }catch(e){
             res.status(500).send(e)
         }
@@ -116,7 +117,7 @@ class usuariosController{
 
     async logout(req,res){
         try{
-            res.clearCookie('access_token');
+            res.clearCookie('refreshToken');
             res.json({message:'Logout exitoso'})
         }catch(e){
             res.status(500).send(e)
@@ -133,8 +134,26 @@ class usuariosController{
             res.json({id,nombre,email,rol})
         }catch(e){
             res.status(401).json({message:'Token invalido'})
+        }   
+    }
+
+    async refreshToken(req,res){
+        const refreshToken=req.cookies.refreshToken
+        const email=req.userConectado.email
+        if(!req.userConectado){
+            return res.status(401).json({message:'Acceso Denegado'})
         }
-        
+
+        if(!refreshToken){
+            return res.status(401).json({ message: 'No hay refresh token' });
+        }
+
+        try{
+            const newAccessToken=generarToken(email)
+            res.status(200).json({accessToken:newAccessToken})
+        }catch(e){
+            res.status(403).json({message:'Refresh Token Invalido'})
+        }
     }
 }
 
