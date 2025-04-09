@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 
 import Login from './pages/Login'
+import Register from './pages/Register'
 import LandingPage from './pages/LandingPage'
 
 import MainLayout from './layouts/MainLayout'
@@ -16,6 +17,7 @@ const App = () => {
           </Route>
           <Route element={<NoNavLayout/>}>
             <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register/>}/>
           </Route>
         </Routes>
       </AuthProvider>

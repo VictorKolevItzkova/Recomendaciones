@@ -18,11 +18,16 @@ export const AuthProvider= ({children}) => {
   }
   
   const logout = async ()=>{
-    await api.get('/usuarios/logout')
+    await api.post('/usuarios/logout')
     setUsuario(null)
   }
+
+  const register = async (email,password,confPassword,nombre)=>{
+    await api.post('/usuarios/registrar',
+      {email,nombre,password,confPassword})
+  }
   return (
-    <AuthContext.Provider value={{usuario,login,logout,api}}>
+    <AuthContext.Provider value={{usuario,login,logout,register,api}}>
       {children}
     </AuthContext.Provider>
   )

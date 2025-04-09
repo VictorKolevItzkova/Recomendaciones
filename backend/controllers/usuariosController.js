@@ -56,7 +56,7 @@ class usuariosController{
     /* REGISTRA USUARIO */
     async registro(req,res){
         try{
-            const {nombre,email,password}=req.body
+            const {email,nombre,password,confPassword}=req.body
             const usuarioExiste= await Usuario.findOne({where:{email:email}}) //Encuentra el primer match
             if(usuarioExiste){
                 return res.status(400).json({error:"El usuario ya existe"})
@@ -72,6 +72,10 @@ class usuariosController{
             //         error: "La contraseña debe tener entre 6 y 100 caracteres, al menos 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial, y no puede contener espacios."
             //     });
             // }
+
+            if(password!=confPassword){
+                return res.status(400).json({error:"Las contraseñas deben ser iguales"})
+            }
 
             const password_encriptado=await bcrypt.hash(password,3)
             const data=await Usuario.create({
