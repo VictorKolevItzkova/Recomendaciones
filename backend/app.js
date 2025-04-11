@@ -5,6 +5,7 @@ import routesUsuario from "./routes/routesUsuario.js"
 import routesPelis from './routes/routesPelis.js'
 import routesVista from './routes/routesVista.js'
 import routesGeneros from './routes/routesGenero.js';
+import routesBusqueda from './routes/routesBusqueda.js';
 import dbClient from "./config/dbClient.js"
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
@@ -23,6 +24,7 @@ app.use("/api/usuarios",routesUsuario)
 app.use("/api/peliculas",routesPelis)
 app.use("/api/historial",routesVista)
 app.use("/api/generos",routesGeneros)
+app.use("/api/search",routesBusqueda)
 
 /* SINCRONIZAR BD Y ESCUCHAR POR PUERTO*/
 try{

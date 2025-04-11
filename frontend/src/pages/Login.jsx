@@ -34,7 +34,7 @@ const Login = () => {
             <InputField label="Email" value={email} type="email" onChange={(e) => setEmail(e.target.value)} />
               
               <InputField label="Contraseña" value={password} type="password" onChange={(e) => setPassword(e.target.value)} showPasswordToggle={true} />
-              <button className="relative w-full inline-flex items-center justify-center p-3 font-medium rounded-md border border-transparent group bg-black/30 overflow-hidden" type="submit">
+              <button className="cursor-pointer relative w-full inline-flex items-center justify-center p-3 font-medium rounded-md border border-transparent group bg-black/30 overflow-hidden" type="submit">
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 rounded-md blur-sm opacity-75 group-hover:opacity-100 transition duration-300 animate-pulse"></span>
                 <span className="relative z-10">Login</span>
               </button>
