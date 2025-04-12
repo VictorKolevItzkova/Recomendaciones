@@ -1,4 +1,6 @@
 import express from 'express'
+import path from 'path';
+import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser'; 
 import "dotenv/config"
 import routesUsuario from "./routes/routesUsuario.js"
@@ -11,6 +13,9 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 
 const app=express()
+const __filename=fileURLToPath(import.meta.url)
+const __dirname=path.dirname(__filename)
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(cors({
@@ -18,7 +23,7 @@ app.use(cors({
     credentials:true
 }))
 app.use(cookieParser())
-
+app.use('/uploads',express.static(path.join(__dirname,'uploads')))
 /* RUTAS */
 app.use("/api/usuarios",routesUsuario)
 app.use("/api/peliculas",routesPelis)

@@ -32,7 +32,7 @@ const Usuario = dbClient.define('usuario', {
     },
     pfp:{
         type:DataTypes.STRING,
-        defaultValue: 'Default_pfp.jpg'
+        defaultValue: 'Default_pfp.png'
     }
 })
 

@@ -79,7 +79,7 @@ class usuariosController{
 
             const password_encriptado=await bcrypt.hash(password,3)
 
-            const imagenDefecto='Default_pfp.jpg'
+            const imagenDefecto='Default_pfp.png'
             const data=await Usuario.create({
                 nombre:nombre,
                 email:email,
@@ -136,9 +136,9 @@ class usuariosController{
             if(!req.userConectado){
                 return res.status(401).json({message:'Acceso Denegado'})
             }
-            const {id,nombre,email,rol} = req.userConectado
+            const {id,nombre,email,rol,pfp} = req.userConectado
 
-            res.json({id,nombre,email,rol})
+            res.json({id,nombre,email,rol,pfp})
         }catch(e){
             res.status(401).json({message:'Token invalido'})
         }   

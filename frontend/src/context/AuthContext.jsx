@@ -7,7 +7,7 @@ export const AuthProvider= ({children}) => {
 
   useEffect(()=>{
     api.get('/usuarios/me')
-    .then(res=>setUsuario(res.data.email))
+    .then(res=>setUsuario(res.data))
     .catch(()=>setUsuario(null))
   },[])
 
