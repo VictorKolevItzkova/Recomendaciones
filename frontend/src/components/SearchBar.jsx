@@ -14,7 +14,7 @@ const SearchBar = ({ searchTerm, setSearchTerm, navigate }) => {
     }else {
       navigate(`/buscar?q=${encodeURIComponent(debounceSearch)}`);
     }
-  },500,[searchTerm])
+  },500,[debounceSearch])
 
   const handleChange = (e) => {
     const value = e.target.value

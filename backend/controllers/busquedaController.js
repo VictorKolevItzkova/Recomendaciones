@@ -11,7 +11,7 @@ class busquedaController {
         const { query } = req.params
 
         try {
-            const [usuarios, peliculas, cast] = await Promise.all([
+            const [usuarios, peliculas, creditos] = await Promise.all([
                 buscarUsuarios(query),
                 buscarPeliculas(query),
                 buscarCreditos(query)
@@ -19,9 +19,9 @@ class busquedaController {
             
             const usuariosMarcados = usuarios.map(u => ({ ...u.toJSON(), tipo: 'usuario' }))
             const peliculasMarcadas = peliculas.map(p => ({ ...p.toJSON(), tipo: 'pelicula' }))
-            const castMarcado = cast.map(c => ({ ...c.toJSON(), tipo: 'cast' }))
+            const creditosMarcado = creditos.map(c => ({ ...c.toJSON(), tipo: 'creditos' }))
         
-            const combinados = [...peliculasMarcadas,...usuariosMarcados, ...castMarcado]
+            const combinados = [...peliculasMarcadas,...usuariosMarcados, ...creditosMarcado]
         
             res.status(200).json(combinados)
         } catch (e) {
@@ -35,11 +35,9 @@ class busquedaController {
         try {
             const usuarios = await buscarUsuarios(query)
 
-            if (usuarios.length === 0) {
-                return res.status(404).json({ message: "No se encontraron usuarios" });
-            }
+            const usuariosMarcados = usuarios.map(u => ({ ...u.toJSON(), tipo: 'usuario' }))
 
-            res.status(200).json( usuarios )
+            res.status(200).json( usuariosMarcados )
         } catch (e) {
             res.status(500).json({ message: "Error al Buscar" })
         }
@@ -51,11 +49,9 @@ class busquedaController {
         try {
             const peliculas = await buscarPeliculas(query)
 
-            if (peliculas.length === 0) {
-                return res.status(404).json({ message: "No se encontraron peliculas" });
-            }
+            const peliculasMarcadas = peliculas.map(p => ({ ...p.toJSON(), tipo: 'pelicula' }))
 
-            res.status(200).json( peliculas )
+            res.status(200).json( peliculasMarcadas )
         } catch (e) {
             res.status(500).json({ message: "Error al Buscar" })
         }
@@ -67,11 +63,9 @@ class busquedaController {
         try {
             const creditos = await buscarCreditos(query)
 
-            if (creditos.length === 0) {
-                return res.status(404).json({ message: "No se encontraron creditos" });
-            }
+            const creditosMarcado = creditos.map(c => ({ ...c.toJSON(), tipo: 'creditos' }))
 
-            res.status(200).json( creditos )
+            res.status(200).json( creditosMarcado )
         } catch (e) {
             res.status(500).json({ message: "Error al Buscar" })
         }
