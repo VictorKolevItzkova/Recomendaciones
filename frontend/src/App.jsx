@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import LandingPage from './pages/LandingPage'
+import ResultadosBusqueda from './pages/ResultadosBusqueda'
 
 import MainLayout from './layouts/MainLayout'
 import NoNavLayout from './layouts/NoNavLayout'
@@ -14,6 +15,7 @@ const App = () => {
         <Routes>
           <Route element={<MainLayout/>}>
             <Route path='/' element={<LandingPage />} />
+            <Route path='/buscar' element={<ResultadosBusqueda/>} />
           </Route>
           <Route element={<NoNavLayout/>}>
             <Route path='/login' element={<Login />} />

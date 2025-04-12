@@ -16,8 +16,14 @@ class busquedaController {
                 buscarPeliculas(query),
                 buscarCreditos(query)
             ]);
-
-            res.status(200).json({ usuarios, peliculas, cast })
+            
+            const usuariosMarcados = usuarios.map(u => ({ ...u.toJSON(), tipo: 'usuario' }))
+            const peliculasMarcadas = peliculas.map(p => ({ ...p.toJSON(), tipo: 'pelicula' }))
+            const castMarcado = cast.map(c => ({ ...c.toJSON(), tipo: 'cast' }))
+        
+            const combinados = [...peliculasMarcadas,...usuariosMarcados, ...castMarcado]
+        
+            res.status(200).json(combinados)
         } catch (e) {
             res.status(500).json({ message: "Error al Buscar" })
         }
