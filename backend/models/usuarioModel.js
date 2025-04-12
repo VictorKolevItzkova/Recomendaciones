@@ -29,6 +29,10 @@ const Usuario = dbClient.define('usuario', {
         type: DataTypes.ENUM('admin', 'usuario'),
         allowNull: false,
         defaultValue: 'usuario'
+    },
+    pfp:{
+        type:DataTypes.STRING,
+        defaultValue: 'Default_pfp.jpg'
     }
 })
 

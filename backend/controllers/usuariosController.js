@@ -78,10 +78,13 @@ class usuariosController{
             }
 
             const password_encriptado=await bcrypt.hash(password,3)
+
+            const imagenDefecto='Default_pfp.jpg'
             const data=await Usuario.create({
                 nombre:nombre,
                 email:email,
-                password:password_encriptado
+                password:password_encriptado,
+                pfp:imagenDefecto
             })
 
             res.status(201).json(data)
