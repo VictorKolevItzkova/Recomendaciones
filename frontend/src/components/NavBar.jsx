@@ -18,7 +18,6 @@ const NavBar = () => {
 
     }
 
-    console.log(usuario)
     return (
         <nav className="bg-cyan-700 p-4 text-white shadow-md">
             <div className="container mx-auto flex justify-between items-center">
@@ -33,7 +32,7 @@ const NavBar = () => {
                             >
                                 Diario
                             </Link>
-                            <Link>
+                            <Link to="/settings">
                                 <img className='mx-4 bg-white rounded-full w-12 h-12' src={`${baseImgUrl}${usuario.pfp}`} alt="" />
                             </Link>
                         </>

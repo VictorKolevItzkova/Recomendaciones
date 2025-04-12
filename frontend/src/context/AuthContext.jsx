@@ -1,33 +1,55 @@
 import React, { createContext, useEffect, useState } from 'react'
 import api from '../api/axiosConfig.jsx'
+import { useNavigate } from 'react-router-dom';
 export const AuthContext=createContext();
 
 export const AuthProvider= ({children}) => {
   const [usuario,setUsuario]=useState(null)
-
+  const navigate=useNavigate()
   useEffect(()=>{
-    api.get('/usuarios/me')
-    .then(res=>setUsuario(res.data))
-    .catch(()=>setUsuario(null))
+    const fetchUsuario = async () => {
+      try {
+        const response = await api.get('/usuarios/me');
+        setUsuario(response.data);
+      } catch (error) {
+        setUsuario(null);
+      }
+    };
+  
+    fetchUsuario();
   },[])
 
   const login = async (email,password)=>{
     await api.post('/usuarios/login',
       {email,password})
-    setUsuario({email})
+    const response = await api.get('/usuarios/me');
+    setUsuario(response.data)
   }
   
   const logout = async ()=>{
     await api.post('/usuarios/logout')
     setUsuario(null)
+    navigate('/')
   }
 
   const register = async (email,password,confPassword,nombre)=>{
     await api.post('/usuarios/registrar',
       {email,nombre,password,confPassword})
   }
+
+  const updateUser = async (formData) => {
+    try {
+      const response = await api.put('/usuarios', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setUsuario(response.data); // Actualizamos el usuario con los nuevos datos
+    } catch (error) {
+      console.error("Error actualizando el perfil:", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{usuario,login,logout,register,api}}>
+    <AuthContext.Provider value={{usuario,login,logout,register,updateUser,api}}>
       {children}
     </AuthContext.Provider>
   )

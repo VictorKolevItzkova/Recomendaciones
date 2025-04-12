@@ -5,21 +5,27 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import LandingPage from './pages/LandingPage'
 import ResultadosBusqueda from './pages/ResultadosBusqueda'
+import Settings from './pages/Settings'
 
 import MainLayout from './layouts/MainLayout'
 import NoNavLayout from './layouts/NoNavLayout'
+import RutaProtegida from './components/RutaProtegida'
 const App = () => {
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          <Route element={<MainLayout/>}>
+          <Route element={<MainLayout />}>
             <Route path='/' element={<LandingPage />} />
-            <Route path='/buscar' element={<ResultadosBusqueda/>} />
+            <Route path='/buscar' element={<ResultadosBusqueda />} />
+            <Route path='/settings' element={
+              <RutaProtegida>
+                <Settings />
+              </RutaProtegida>} />
           </Route>
-          <Route element={<NoNavLayout/>}>
+          <Route element={<NoNavLayout />}>
             <Route path='/login' element={<Login />} />
-            <Route path='/register' element={<Register/>}/>
+            <Route path='/register' element={<Register />} />
           </Route>
         </Routes>
       </AuthProvider>

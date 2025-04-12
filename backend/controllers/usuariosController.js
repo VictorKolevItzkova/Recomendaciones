@@ -1,6 +1,8 @@
 import Usuario from '../models/usuarioModel.js'
 import bcrypt from 'bcrypt'
 import { generarToken, refrescarToken } from '../helpers/authentication.js'
+import fs from 'fs'
+import path from 'path'
 class usuariosController{
     constructor(){}
 
@@ -50,6 +52,49 @@ class usuariosController{
             return res.json({ message: "El usuario ahora es administrador", usuario });
         }catch(e){
             res.status(500).send(e)
+        }
+    }
+
+    async update(req,res){
+        try{
+            
+            const {nombre,newPassword}=req.body            
+
+            const usuarioExiste= await Usuario.findOne({where:{email:req.userConectado.email}})
+            
+            if(!usuarioExiste){
+                return res.status(404).json({message:"Usuario no encontrado"})
+            }            
+            
+            let rutaImagen=usuarioExiste.pfp || 'Default_pfp.png'
+
+            if(req.file){
+                try{
+                    if(usuarioExiste.pfp && fs.existsSync(`/uploads/images/${path.basename(usuarioExiste.pfp)}`)){
+                        fs.unlinkSync(`/uploads/images/${path.basename(usuarioExiste.pfp)}`)
+                    }
+    
+                    rutaImagen = `${req.file.filename}`
+                }catch(e){
+                    return res.status(403).json({message:"Error al eliminar la imagen anterior"})
+                }
+            }
+
+            const datosActualizados = {
+                nombre,
+                pfp:rutaImagen
+            }
+
+            if(newPassword){
+                datosActualizados.password=await bcrypt.hash(newPassword,3)
+            }
+
+            await usuarioExiste.update(datosActualizados)
+
+            const {id,nombreAct,email,rol,pfp} = usuarioExiste
+            res.status(202).json({id,nombreAct,email,rol,pfp})
+        }catch(e){
+            res.status(500).json({message:"Error al actualizar el usuario"})
         }
     }
 
@@ -117,6 +162,26 @@ class usuariosController{
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
             res.status(200).json(accessToken)
+        }catch(e){
+            res.status(500).send(e)
+        }
+    }
+
+    async checkPassword(req,res){
+        try{
+            const {password}=req.body
+            const usuarioExiste=await Usuario.findOne({where:{email:req.userConectado.email}})
+
+            if(!usuarioExiste){
+                return res.status(400).json({estado:false})
+            }
+            const passValid=await bcrypt.compare(password,usuarioExiste.password)
+
+            if(!passValid){
+                return res.status(200).json({estado:false})
+            }
+
+            res.status(200).json({estado:true})
         }catch(e){
             res.status(500).send(e)
         }
