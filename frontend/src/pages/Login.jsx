@@ -22,7 +22,7 @@ const Login = () => {
   return (
     <div className="flex flex-col h-screen">
       <nav className="w-full px-6 py-4 flex items-center justify-center md:justify-start bg-transparent">
-        <Link to="/" className="md:ml-32 text-2xl font-bold text-white">Mi App</Link>
+        <Link to="/" className="md:ml-32 text-2xl font-bold text-white">MatchIT</Link>
       </nav>
       
       <div className="flex flex-1">
