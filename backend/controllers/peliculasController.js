@@ -361,6 +361,22 @@ class peliculasController {
             res.status(500).send(e)
         }
     }
+
+    async obtenerPeliculasDestacadas(req,res){
+        try{
+            const ids=[27205,155,680,550]
+
+            const peliculas = await Pelicula.findAll({
+                where: {
+                    id: ids
+                }
+            });
+    
+            res.status(200).json(peliculas);
+        }catch(e){
+            res.status(500).json({ error: 'Error al obtener las películas destacadas' });
+        }
+    }
 }
 
 export default new peliculasController()

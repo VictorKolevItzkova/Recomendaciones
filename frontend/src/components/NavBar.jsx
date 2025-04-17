@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'
 import SearchBar from './SearchBar'
 const NavBar = () => {
-    const baseImgUrl = 'http://localhost:5100/uploads/images/'
+    const baseImgUrl = import.meta.env.VITE_BASE_IMG_URL
     const { usuario, logout } = useContext(AuthContext)
     const [searchTerm, setSearchTerm] = useState('')
     const navigate = useNavigate()

@@ -6,9 +6,11 @@ const route=express.Router()
 
 /* RUTAS /peliculas */
 route.get('/',peliculasController.getAll)
-route.get('/select/:id',verificarToken,peliculasController.getOne)
+route.get('/select/:id',peliculasController.getOne)
 route.get('/insertar',verificarToken,peliculasController.create)
 route.get('/recomendacion',verificarToken,peliculasController.obtenerRecomendaciones)
 route.get('/recomendacionDiaria',verificarToken,peliculasController.obtenerRecomendacionDiaria)
+route.get('/destacadas',peliculasController.obtenerPeliculasDestacadas)
+
 
 export default route

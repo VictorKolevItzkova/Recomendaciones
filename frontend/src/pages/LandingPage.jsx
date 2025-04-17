@@ -2,6 +2,8 @@ import { useNavigate,Link } from "react-router-dom"
 import herobg from "../assets/heroBg.png"
 import herobgMv from "../assets/heroBgMv.png"
 import { MailPlus,MailCheck } from "lucide-react"
+import Reviews from "../components/Reviews"
+import PeliculasDestacadas from "../components/PeliculasDestacadas"
 const LandingPage = () => {
     const navigate = useNavigate()
     return (
@@ -18,7 +20,7 @@ const LandingPage = () => {
                     </p>
                     <div className="flex justify-center md:justify-start">
                         <button
-                            onClick={() => navigate("/explore")}
+                            onClick={() => navigate("/login")}
                             className="cursor-pointer relative inline-flex items-center justify-center py-3 px-5 mt-4 font-medium rounded-md border border-transparent group bg-black/30 overflow-hidden"
                         >
                             <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 rounded-md blur-sm opacity-75 group-hover:opacity-100 transition duration-300 animate-pulse"></span>
@@ -27,48 +29,8 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            <section className="p-20">
-                <h1 className="text-4xl font-bold leading-tight mb-4">
-                    Películas Famosas
-                </h1>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {/* Card de película */}
-                    {[
-                        {
-                            title: "Inception",
-                            image: "https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg"
-                        },
-                        {
-                            title: "The Dark Knight",
-                            image: "https://image.tmdb.org/t/p/w500/1hRoyzDtpgMU7Dz4JF22RANzQO7.jpg"
-                        },
-                        {
-                            title: "Pulp Fiction",
-                            image: "https://image.tmdb.org/t/p/w500/dM2w364MScsjFf8pfMbaWUcWrR.jpg"
-                        },
-                        {
-                            title: "Fight Club",
-                            image: "https://image.tmdb.org/t/p/w500/bptfVGEQuv6vDTIMVCHjJ9Dz8PX.jpg"
-                        },
-                    ].map((pelicula, index) => (
-                        <div key={index} className="bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300">
-                            <img
-                                src={pelicula.image}
-                                alt={pelicula.title}
-                                className="w-full h-64 object-cover"
-                            />
-                            <div className="p-4">
-                                <h2 className="text-xl font-semibold">{pelicula.title}</h2>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-            <section className="p-20">
-                <h1 className="text-4xl font-bold leading-tight mb-4">
-                    Reseñas
-                </h1>
-            </section>
+            <PeliculasDestacadas/>
+            <Reviews/>
             <section className="p-20 bg-black">
                 <div className="w-1/2">
                     <h1 className="text-7xl font-bold leading-tight mb-4">

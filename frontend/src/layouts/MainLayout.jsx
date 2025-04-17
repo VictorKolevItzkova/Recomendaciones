@@ -3,13 +3,13 @@ import NavBar from "../components/NavBar"
 import Footer from "../components/Footer"
 const MainLayout = () => {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
         <NavBar/>
-        <main>
+        <main className="flex-grow">
             <Outlet/>
         </main>
         <Footer/>
-    </>
+    </div>
   )
 }
 
