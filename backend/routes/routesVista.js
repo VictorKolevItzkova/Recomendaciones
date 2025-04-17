@@ -7,8 +7,10 @@ const route=express.Router()
 /* RUTAS /historial */
 route.get('/',verificarToken,vistaController.getAll)
 route.get('/reviews/destacadas',vistaController.getReviewsDestacadas)
-route.put('/actualizar',verificarToken,vistaController.update)
 route.post('/marcarVista',verificarToken,vistaController.marcarVista)
+route.put('/actualizar/calificacion',verificarToken,vistaController.actualizarCalificacion)
+route.put('/actualizar/review',verificarToken,vistaController.actualizarReview)
+route.delete('/eliminar',verificarToken,vistaController.desmarcarVista)
 
 
 export default route

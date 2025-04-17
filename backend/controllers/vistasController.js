@@ -16,32 +16,6 @@ class vistasController {
         }
     }
 
-    /* ACTUALIZAR VISTA */
-    async update(req, res) {
-        try {
-            const { peliculaId, calificacion, comentarios, fecha_vista } = req.body
-            const usuarioId = req.userConectado.id
-
-            const vistaExiste = await Vista.findOne({ where: { usuarioId, peliculaId } })
-
-            if (!vistaExiste) {
-                return res.status(404).json({ message: "Pelicula no encontrada" })
-            }
-
-            const fechaVistaFinal = fecha_vista ? new Date(fecha_vista).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-
-            await vistaExiste.update({
-                calificacion,
-                comentarios,
-                fecha_vista: fechaVistaFinal
-            })
-
-            res.status(201).json(vistaExiste)
-        } catch (e) {
-            res.status(500).send(e)
-        }
-    }
-
     /* MARCAR PELÍCULA COMO VISTA */
     async marcarVista(req, res) {
         try {
@@ -49,25 +23,111 @@ class vistasController {
             const usuarioId = req.userConectado.id
 
             const vistaExiste = await Vista.findOne({ where: { usuarioId, peliculaId } })
-            /* SI ESTA MARCADA DESMARCARLA */
+
             if (vistaExiste) {
-                await vistaExiste.destroy();
-                return res.status(200).json({ message: "Pelicula desmarcada como vista" })
+                return res.status(400).json({ message: "Ya está marcada como vista" });
             }
 
-            const fechaVistaFinal = fecha_vista ? new Date(fecha_vista).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+            const hayCalificacion = calificacion !== undefined && calificacion !== null;
+            const hayComentario = comentarios && comentarios.trim() !== "";
+            
+            const fechaVistaFinal = fecha_vista 
+                ? new Date(fecha_vista).toISOString().split('T')[0] 
+                : new Date().toISOString().split('T')[0];
 
             const nuevaVista = await Vista.create({
                 usuarioId,
                 peliculaId,
-                calificacion,
-                comentarios,
+                calificacion:hayCalificacion ? calificacion : null,
+                comentarios:hayComentario ? comentarios : null,
                 fecha_vista: fechaVistaFinal
             });
 
-            res.status(201).json(nuevaVista)
+            res.status(201).json({ message: "Película marcada como vista", vista: nuevaVista })
         } catch (e) {
             res.status(500).send(e)
+        }
+    }
+
+    async actualizarCalificacion(req, res) {
+        try {
+            const { peliculaId,calificacion } = req.body
+            const usuarioId = req.userConectado.id
+
+            const vista = await Vista.findOne({ where: { usuarioId, peliculaId } })
+
+            if (!vista) {
+                const fechaVistaFinal = fecha_vista 
+                ? new Date(fecha_vista).toISOString().split('T')[0] 
+                : new Date().toISOString().split('T')[0];
+
+                const nuevaVista = await Vista.create({
+                    usuarioId,
+                    peliculaId,
+                    calificacion:calificacion,
+                    comentarios: null,
+                    fecha_vista: fechaVistaFinal
+                });
+    
+                return res.status(201).json({ message: "Película marcada como vista", vista: nuevaVista })
+            }
+
+            await vista.update({ calificacion })
+
+            res.status(200).json({ message: "Calificación actualizada", vista })
+        } catch (e) {
+            res.status(500).send(e)
+        }
+    }
+
+    async actualizarReview(req, res) {
+        try {
+            const { peliculaId, comentarios } = req.body
+            const usuarioId = req.userConectado.id
+
+            const vista = await Vista.findOne({ where: { usuarioId, peliculaId } })
+
+            if (!vista) {
+                const fechaVistaFinal = fecha_vista 
+                ? new Date(fecha_vista).toISOString().split('T')[0] 
+                : new Date().toISOString().split('T')[0];
+
+                const nuevaVista = await Vista.create({
+                    usuarioId,
+                    peliculaId,
+                    calificacion:calificacion,
+                    comentarios: null,
+                    fecha_vista: fechaVistaFinal
+                });
+    
+                return res.status(201).json({ message: "Película marcada como vista", vista: nuevaVista })
+            }
+
+            await vista.update({ comentarios })
+
+            res.status(200).json({ message: "Comentario actualizado", vista })
+        } catch (e) {
+            res.status(500).send(e)
+        }
+    }
+
+    async desmarcarVista(req, res) {
+        try {
+            const { peliculaId } = req.body;
+            const usuarioId = req.userConectado.id;
+    
+            const vista = await Vista.findOne({ where: { usuarioId, peliculaId } });
+    
+            if (!vista) {
+                return res.status(404).json({ message: "La película no está marcada como vista" });
+            }
+    
+            await vista.destroy();
+    
+            res.status(200).json({ message: "Película desmarcada como vista, calificación y reseña eliminadas" });
+    
+        } catch (error) {
+            res.status(500).json({ message: "Error al desmarcar película", error: error.message });
         }
     }
 
