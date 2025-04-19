@@ -57,16 +57,14 @@ class vistasController {
             const vista = await Vista.findOne({ where: { usuarioId, peliculaId } })
 
             if (!vista) {
-                const fechaVistaFinal = fecha_vista 
-                ? new Date(fecha_vista).toISOString().split('T')[0] 
-                : new Date().toISOString().split('T')[0];
+                const fecha_vista = new Date().toISOString().split('T')[0];
 
                 const nuevaVista = await Vista.create({
                     usuarioId,
                     peliculaId,
                     calificacion:calificacion,
                     comentarios: null,
-                    fecha_vista: fechaVistaFinal
+                    fecha_vista: fecha_vista
                 });
     
                 return res.status(201).json({ message: "Película marcada como vista", vista: nuevaVista })
@@ -76,6 +74,7 @@ class vistasController {
 
             res.status(200).json({ message: "Calificación actualizada", vista })
         } catch (e) {
+            console.log(e)
             res.status(500).send(e)
         }
     }

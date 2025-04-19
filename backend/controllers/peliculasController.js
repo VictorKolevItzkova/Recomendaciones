@@ -294,6 +294,9 @@ class peliculasController {
                 });
             });
 
+            const peliculasVistasIds = vistas.map(v => v.peliculaId);
+
+
             // Ordenar los géneros por la frecuencia total (favorito primero)
             const generosFavoritos = Object.entries(generoFrecuencia)
                 .sort((a, b) => b[1] - a[1])
@@ -314,17 +317,12 @@ class peliculasController {
                         required: true
                     },
                     where: {
-                        id: {
-                            [Op.notIn]: Sequelize.literal(`(
-                                SELECT peliculaId FROM vista WHERE usuarioId = '${usuarioId}'
-                            )`)  // Excluir las películas ya vistas por el usuario
-                        },
+                        id: { [Op.notIn]: peliculasVistasIds },  // Excluir películas vistas
                         duracion: {
                             [Op.between]: [duracionMedia - 30, duracionMedia + 30]  // Filtrar por duración +- 30 minutos
                         }
                     },
-                    limit: 15,  // Limitar a 15 películas por género
-                    order: [['release_date', 'DESC']]  // Puedes ordenar según la fecha de lanzamiento o calificación
+                    limit: 15  // Limitar a 15 películas por género
                 });
 
                 // Guardar las recomendaciones para este género

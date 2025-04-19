@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes,ScrollRestoration } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 
 import Login from './pages/Login'
@@ -6,11 +6,12 @@ import Register from './pages/Register'
 import ResultadosBusqueda from './pages/ResultadosBusqueda'
 import Settings from './pages/Settings'
 import DetallePelicula from './pages/DetallePelicula'
+import HomeRedirect from './pages/HomeRedirect'
 
 import MainLayout from './layouts/MainLayout'
 import NoNavLayout from './layouts/NoNavLayout'
+
 import RutaProtegida from './components/RutaProtegida'
-import HomeRedirect from './pages/HomeRedirect'
 const App = () => {
   return (
     <Router>

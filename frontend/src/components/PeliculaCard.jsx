@@ -16,7 +16,7 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
         setHoverValue(value)
     }
 
-    const handleClick = (e, index) => {
+    const handleClick = async (e, index) => {
         if (!usuario) return
 
         const { left, width } = e.currentTarget.getBoundingClientRect()
@@ -24,7 +24,7 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
         const value = mouseX < width / 2 ? index - 0.5 : index
 
         try {
-            const response = api.post('', {})
+            const response = await api.put('/historial/actualizar/calificacion', {peliculaId: id, calificacion: value})
 
             setCalificacion(value)
         } catch (error) {
