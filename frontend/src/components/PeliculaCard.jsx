@@ -39,7 +39,7 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
         return <FaRegStar className="text-gray-500" />
     }
     return (
-        <div className="bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300"
+        <div className="relative w-64 bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => {
                 setHovered(false)
@@ -53,11 +53,11 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
                     className="w-full h-64 object-cover"
                 />
                 <div className="p-4">
-                    <h2 className="text-xl font-semibold">{titulo}</h2>
+                    <h2 className="text-xl font-semibold break-words line-clamp-1">{titulo}</h2>
                 </div>
             </Link>
             {hovered && (
-                <div className="absolute bottom-0 left-0 right-0 bg-gray-900 bg-opacity-90 p-5 flex justify-center gap-1">
+                <div className="absolute bottom-0 left-0 right-0 bg-gray-900 bg-opacity-90 p-4 flex justify-center gap-1">
                     <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((i) => (
                             <div

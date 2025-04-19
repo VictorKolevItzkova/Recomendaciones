@@ -9,15 +9,17 @@ const Settings = () => {
     const [isPasswordValid, setIsPasswordValid] = useState(false)
     const [pfp, setPfp] = useState('')
     const [preview, setPreview] = useState('')
+    const [showModal, setShowModal] = useState(false)
 
     useEffect(() => {
+        console.log('usuario:', usuario)
         if (usuario) {
-            setNombre(usuario.nombre)
+            setNombre(usuario.nombre || '')
             if (usuario.pfp) {
                 setPreview(`http://localhost:5100/uploads/images/${usuario.pfp}`)
             }
         }
-    }, [])
+    }, [usuario])
 
     const handleFileChange = (e) => {
         const file = e.target.files[0]
@@ -28,9 +30,9 @@ const Settings = () => {
     const verificarPassword = async () => {
         try {
             const res = await api.post('/usuarios/checkPassword', { password: passwordActual })
-
             if (res.data.estado) {
                 setIsPasswordValid(true)
+                setShowModal(false)
             }
         } catch (err) {
             console.log(err)
@@ -42,87 +44,130 @@ const Settings = () => {
         const formData = new FormData()
         formData.append('nombre', nombre)
         formData.append('pfp', pfp)
-        if(newPassword){
+        if (newPassword) {
             formData.append('newPassword', newPassword)
-            setIsPasswordValid(!isPasswordValid)
+            setIsPasswordValid(false)
             setPasswordActual('')
             setNewPassword('')
         }
 
         try {
             updateUser(formData)
+            setNombre(formData.get('nombre'))
+            setShowModal(false)
         } catch (err) {
-            console.log(err)
-            if(err.response){
-                console.log('Respuesta servidor:', err)
-            }else{
-                console.log('Error general:', err)
-            }
+            console.log('Error al actualizar usuario:', err)
         }
     }
 
     return (
-        <div className="p-4 max-w-md mx-auto">
-            <h2 className="text-xl font-bold mb-4">Ajustes de usuario</h2>
-
-            <form onSubmit={handleSubmit}>
-                <label className="block mb-2">Nombre:</label>
-                <input
-                    type="text"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    className="border rounded w-full px-2 py-1 mb-4"
-                />
-
-                <label className="block mb-2">Nueva contraseña (opcional):</label>
-                {!isPasswordValid ? (
-                    <>
-                        <label className="block mb-2">Verifica tu contraseña:</label>
-                        <input
-                            type="password"
-                            value={passwordActual}
-                            onChange={(e) => setPasswordActual(e.target.value)}
-                            className="border rounded w-full px-2 py-1 mb-2"
-                        />
-                        <button
-                            type="button"
-                            onClick={verificarPassword}
-                            className="bg-blue-600 text-white px-4 py-1 rounded mb-4"
-                        >
-                            Verificar
-                        </button>
-                    </>
-
-                ) : (<input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="border rounded w-full px-2 py-1 mb-4"
-                />)
-                }
-
-                <label className="block mb-2">Foto de perfil:</label>
-                <input
-                    className="mb-2 bg-amber-50 text-black"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                />
-                {preview && <img src={preview} alt="preview" className="w-24 h-24 object-cover rounded-full mb-4" />}
+        <div className="flex flex-col md:flex-row p-6 max-w-4xl mx-auto gap-8">
+            {/* Sección izquierda */}
+            <div className="md:w-1/3 space-y-4">
+                <button
+                    onClick={handleSubmit}
+                    className="bg-green-600 w-full text-white px-4 py-2 rounded"
+                >
+                    Guardar cambios
+                </button>
 
                 <button
-                    type="submit"
-                    className="bg-green-600 text-white px-4 py-2 rounded"
+                    onClick={logout}
+                    className="bg-red-600 w-full text-white px-4 py-2 rounded"
                 >
-                    Guardar
+                    Cerrar sesión
                 </button>
-            </form>
-            <button type="button"
-                onClick={logout}
-                className="bg-red-600 text-white px-4 py-2 rounded mt-4">
-                
-                Cerrar sesión
-            </button>
+            </div>
+
+            {/* Sección derecha */}
+            <div className="md:w-2/3">
+                <form onSubmit={handleSubmit}>
+                    <label className="block mb-2 font-semibold">Nombre:</label>
+                    <input
+                        type="text"
+                        value={nombre}
+                        onChange={(e) => setNombre(e.target.value)}
+                        className="border rounded w-full px-2 py-1 mb-4"
+                    />
+
+                    <label className="block mb-2 font-semibold">Foto de perfil:</label>
+                    <div className="mb-4">
+                        <input
+                            id="fileInput"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+
+                        <label
+                            htmlFor="fileInput"
+                            className="inline-block cursor-pointer bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                        >
+                            Seleccionar imagen
+                        </label>
+                    </div>
+                    {preview && <img src={preview} alt="preview" className="w-34 h-34 object-cover rounded-full my-4" />}
+
+                    {isPasswordValid && (
+                        <>
+                            <label className="block mb-2">Nueva contraseña:</label>
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="border rounded w-full px-2 py-1 mb-4"
+                            />
+                        </>
+                    )}
+
+                    <button
+                        type="button"
+                        onClick={() => setShowModal(true)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                        Cambiar contraseña
+                    </button>
+                </form>
+            </div>
+
+            {/* Modal cambiar contraseña */}
+            {showModal && (
+                <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm relative">
+                        <button
+                            onClick={() => {
+                                setShowModal(false)
+                                setIsPasswordValid(false)
+                                setPasswordActual('')
+                                setNewPassword('')
+                            }}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+                        >
+                            &times;
+                        </button>
+                        <h3 className="text-black text-lg font-semibold mb-4">Cambiar contraseña</h3>
+
+                        {!isPasswordValid &&
+                            <>
+                                <label className="text-black block mb-2">Verifica tu contraseña actual:</label>
+                                <input
+                                    type="password"
+                                    value={passwordActual}
+                                    onChange={(e) => setPasswordActual(e.target.value)}
+                                    className="text-black border rounded w-full px-2 py-1 mb-4"
+                                />
+                                <button
+                                    onClick={verificarPassword}
+                                    className="bg-blue-600 text-white px-4 py-1 rounded"
+                                >
+                                    Verificar
+                                </button>
+                            </>
+                        }
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

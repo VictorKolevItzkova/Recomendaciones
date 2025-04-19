@@ -4,6 +4,7 @@ import Vista from "./vistaModel.js";
 import Genero from "./generoModel.js";
 import Credito from "./creditoModel.js";
 import PeliculaCredito from "./PeliculaCreditoModel.js";
+import RecomendacionDiaria from "./recomendacionDiariaModel.js";
 /* CREA TABLA pelicula */
 const Pelicula = dbClient.define('pelicula', {
     id: {
@@ -50,7 +51,13 @@ Vista.belongsTo(Pelicula,{foreignKey:'peliculaId'})
 Pelicula.belongsToMany(Genero,{through:"PeliculaGenero"})
 Genero.belongsToMany(Pelicula,{through:"PeliculaGenero"})
 
+/*RELACIÓN N:N Y CREA TABLA INTERMEDIA PeliculaCredito */
 Pelicula.belongsToMany(Credito,{through:PeliculaCredito})
 Credito.belongsToMany(Pelicula,{through:PeliculaCredito})
+
+/* RELACIÓN 1:N */
+Pelicula.hasMany(RecomendacionDiaria,{},{foreignKey:'peliculaId'})
+RecomendacionDiaria.belongsTo(Pelicula,{foreignKey:'peliculaId'})
+
 
 export default Pelicula

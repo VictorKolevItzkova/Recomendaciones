@@ -17,7 +17,6 @@ const PeliculasDestacadas = () => {
         fetchPeliculasDestacadas()
     }, [])
 
-    console.log(peliculas)
     return (
         <section className="p-20">
             <h1 className="text-4xl font-bold leading-tight mb-4">

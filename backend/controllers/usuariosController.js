@@ -58,7 +58,7 @@ class usuariosController{
     async update(req,res){
         try{
             
-            const {nombre,newPassword}=req.body            
+            const {nombre:nombreNuevo,newPassword}=req.body            
 
             const usuarioExiste= await Usuario.findOne({where:{email:req.userConectado.email}})
             
@@ -81,7 +81,7 @@ class usuariosController{
             }
 
             const datosActualizados = {
-                nombre,
+                nombre:nombreNuevo,
                 pfp:rutaImagen
             }
 
@@ -90,9 +90,8 @@ class usuariosController{
             }
 
             await usuarioExiste.update(datosActualizados)
-
-            const {id,nombreAct,email,rol,pfp} = usuarioExiste
-            res.status(202).json({id,nombreAct,email,rol,pfp})
+            const {id,nombre,email,rol,pfp} = usuarioExiste
+            res.status(202).json({id,nombre,email,rol,pfp})
         }catch(e){
             res.status(500).json({message:"Error al actualizar el usuario"})
         }

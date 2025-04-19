@@ -5,7 +5,7 @@ import Usuario from "../models/usuarioModel.js";
 import Vista from '../models/vistaModel.js';
 import Genero from '../models/generoModel.js';
 import Credito from '../models/creditoModel.js';
-
+import RecomendacionDiaria from '../models/recomendacionDiariaModel.js';
 class peliculasController {
     constructor() {
 
@@ -297,7 +297,8 @@ class peliculasController {
             // Ordenar los géneros por la frecuencia total (favorito primero)
             const generosFavoritos = Object.entries(generoFrecuencia)
                 .sort((a, b) => b[1] - a[1])
-                .map(([genero, frecuencia]) => genero);
+                .slice(0, 3) // Limitar a los 3 géneros más frecuentes
+                .map(([genero]) => genero);
 
             // Crear un objeto para almacenar las recomendaciones por género
             const recomendacionesPorGenero = {};
@@ -339,26 +340,48 @@ class peliculasController {
     async obtenerRecomendacionDiaria(req, res) {
         try {
             const usuarioId = req.userConectado.id;
-
-            // Obtener una película aleatoria que el usuario no haya visto
+            const hoy = new Date().toISOString().split("T")[0];
+    
+            // Ver si ya existe una recomendación hoy
+            const recomendacionExistente = await RecomendacionDiaria.findOne({
+                where: { usuarioId, fecha: hoy },
+                include: [Pelicula]
+            });
+    
+            if (recomendacionExistente) {
+                return res.status(200).json(recomendacionExistente.pelicula);
+            }
+    
+            // Obtener películas no vistas
+            const vistas = await Vista.findAll({
+                where: { usuarioId },
+                attributes: ['peliculaId']
+            });
+            const peliculasVistasIds = vistas.map(v => v.peliculaId);
+    
             const pelicula = await Pelicula.findOne({
                 where: {
-                    id: {
-                        [Op.notIn]: Sequelize.literal(`(
-                        SELECT peliculaId FROM vista WHERE usuarioId = '${usuarioId}'
-                    )`) // Excluir películas vistas por el usuario
-                    }
+                    id: { [Op.notIn]: peliculasVistasIds }
                 },
-                order: Sequelize.literal('RAND()') // Seleccionar una película aleatoria
+                order: Sequelize.literal('RAND()')
             });
-
+    
             if (!pelicula) {
-                return res.status(404).json({ message: "No hay películas disponibles para recomendar." });
+                return res.status(404).json({ message: "No hay películas nuevas para recomendar." });
             }
-
+    
+            // Guardar la recomendación diaria
+            await RecomendacionDiaria.create({
+                usuarioId,
+                peliculaId: pelicula.id,
+                fecha: hoy
+            });
+    
             res.status(200).json(pelicula);
-        } catch (e) {
-            res.status(500).send(e)
+    
+        } catch (err) {
+            console.log(err)
+            res.status(500).json({ error: "Error al obtener recomendación diaria" });
         }
     }
 
