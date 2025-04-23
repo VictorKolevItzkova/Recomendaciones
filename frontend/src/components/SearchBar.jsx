@@ -3,14 +3,13 @@ import { useEffect, useState } from 'react'
 import {useDebounce} from 'react-use'
 
 const SearchBar = ({ searchTerm, setSearchTerm, navigate }) => {
-  const [locAnterior,setLocAnterior]=useState('/')
   const [debounceSearch,setDebounceSearch]=useState('')
 
   // Evita que se hagan demsiadas llamadas a la API esperando a 
   // que el usuario deje de escribir después de 500 ms
   useDebounce(()=>{
     if(debounceSearch==""){
-      navigate(locAnterior);
+      navigate("/");
     }else {
       navigate(`/buscar?q=${encodeURIComponent(debounceSearch)}`);
     }
@@ -21,11 +20,6 @@ const SearchBar = ({ searchTerm, setSearchTerm, navigate }) => {
     setSearchTerm(value)
     setDebounceSearch(value)
   }
-
-  useEffect(()=>{
-    const pathActual=window.location.pathname
-    setLocAnterior(pathActual)
-  },[])
 
   return (
     <div className="hidden md:block relative w-1/2">

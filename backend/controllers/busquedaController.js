@@ -25,6 +25,7 @@ class busquedaController {
         
             res.status(200).json(combinados)
         } catch (e) {
+            console.log(e)
             res.status(500).json({ message: "Error al Buscar" })
         }
     }
@@ -99,6 +100,18 @@ async function buscarPeliculas(query, limit = 10) {
                 { original_title: { [Op.like]: `%${query}%` } }
             ]
         },
+        include:[
+            {
+                model:Credito,
+                attributes:['id','nombre'],
+                through:{
+                    where:{
+                        rol: 'Director'
+                    }
+                },
+                require: false,
+            }
+        ],
         order: [
             [Sequelize.literal(`
             CASE 
@@ -115,10 +128,19 @@ async function buscarPeliculas(query, limit = 10) {
 }
 
 async function buscarCreditos(query, limit = 3) {
-    return await Credito.findAll({
+    const creditos = await Credito.findAll({
         where: {
             nombre: { [Op.like]: `%${query}%` }
         },
+        include:[
+            {
+                model:Pelicula,
+                attributes:['id'],
+                through:{
+                    attributes: ['rol'],
+                }
+            }
+        ],
         order: [
             [Sequelize.literal(`
             CASE 
@@ -128,8 +150,11 @@ async function buscarCreditos(query, limit = 3) {
             END
           `), 'ASC']
         ],
-        limit
+        limit,
     });
+
+    return creditos;
+
 }
 
 export default new busquedaController()
