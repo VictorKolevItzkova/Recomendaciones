@@ -4,19 +4,9 @@ import { AuthContext } from '../context/AuthContext'
 import SearchBar from './SearchBar'
 const NavBar = () => {
     const baseImgUrl = import.meta.env.VITE_BASE_IMG_URL
-    const { usuario, logout } = useContext(AuthContext)
+    const { usuario } = useContext(AuthContext)
     const [searchTerm, setSearchTerm] = useState('')
     const navigate = useNavigate()
-    const handleClick = async (e) => {
-        try {
-            e.preventDefault()
-            await logout()
-            navigate('/')
-        } catch (err) {
-            console.log("Log Out Fallido", err)
-        }
-
-    }
 
     return (
         <nav className="bg-cyan-700 p-4 text-white shadow-md">

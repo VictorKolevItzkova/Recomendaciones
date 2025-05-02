@@ -4,11 +4,17 @@ import {useDebounce} from 'react-use'
 
 const SearchBar = ({ searchTerm, setSearchTerm, navigate }) => {
   const [debounceSearch,setDebounceSearch]=useState('')
+  const [isFirstRender, setIsFirstRender] = useState(true)
 
   // Evita que se hagan demsiadas llamadas a la API esperando a 
   // que el usuario deje de escribir después de 500 ms
   useDebounce(()=>{
-    if(debounceSearch==""){
+    if (isFirstRender) {
+      // Si es el primer render, no hacemos nada.
+      setIsFirstRender(false)
+      return
+    }
+    if(debounceSearch===''){
       navigate("/");
     }else {
       navigate(`/buscar?q=${encodeURIComponent(debounceSearch)}`);

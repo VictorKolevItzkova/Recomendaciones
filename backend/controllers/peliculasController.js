@@ -40,6 +40,89 @@ class peliculasController {
         }
     }
 
+    async rellenarDirectores(req, res) {
+        try {
+            const adminUser = await Usuario.findOne({ where: { email: req.userConectado.email } });
+
+            if (!adminUser || adminUser.rol !== 'admin') {
+                return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
+            }
+
+            const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            const obtenerCreditosTMDb = async (peliculaId) => {
+                try {
+                    const response = await axios.get(`https://api.themoviedb.org/3/movie/${peliculaId}/credits`,
+                        {
+                            headers: {
+                                accept: 'application/json',
+                                Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+                            }
+                        });
+                    return response.data;
+                } catch (error) {
+                    console.error(`Error obteniendo créditos para la película ${peliculaId}:`, error);
+                    return null;
+                }
+            };
+
+            const peliculas = await Pelicula.findAll({
+                include: [
+                    {
+                        model: Credito,
+                        through: { where: { rol: 'Director' } },
+                        required: false
+                    }
+                ]
+            })
+
+            for (const pelicula of peliculas) {
+                await delay(1000)
+                // Si la película no tiene director (es decir, no está asociada a un Credito con job === 'Director')
+                if (pelicula.creditos.length === 0) {
+                    console.log(`Obteniendo créditos de la película: ${pelicula.title}`);
+
+                    // Obtener los créditos de la película desde TMDb
+                    const creditos = await obtenerCreditosTMDb(pelicula.id);
+
+                    if (creditos && creditos.crew) {
+                        // Buscar al director en los créditos
+                        const director = creditos.crew.find(person => person.job === 'Director');
+
+                        console.log(`Obteniendo créditos`);
+
+                        if (director) {
+                            let credito = await Credito.findOne({
+                                where: { id: director.id }
+                            });
+
+                            if (!credito) {
+                                // Si no se encuentra el crédito por id, lo creamos con los otros parámetros
+                                credito = await Credito.create({
+                                    id: director.id,
+                                    nombre: director.name,
+                                    imagen: director.profile_path ? `https://image.tmdb.org/t/p/original${director.profile_path}` : null
+                                });
+                            }
+                            console.log(`créditos`);
+                            // Relacionar la película con el director en la tabla intermedia PeliculaCreditos
+                            await pelicula.addCredito(credito, { through: { rol: 'Director' } });
+
+
+                            console.log(`Director para ${pelicula.title} actualizado: ${director.name}`);
+                        } else {
+                            console.log(`No se encontró director para ${pelicula.title}`);
+                        }
+                    }
+                }
+            }
+            res.status(200).json({ message: "Directores rellenados correctamente" });
+        } catch (e) {
+            console.log(e)
+            res.status(500).send('Error al rellenar directores');
+        }
+    }
+
     /* INSERTAR PELICULAS A BD, RESTRINGIDO A ADMINS */
     async create(req, res) {
         try {
@@ -339,62 +422,81 @@ class peliculasController {
         try {
             const usuarioId = req.userConectado.id;
             const hoy = new Date().toISOString().split("T")[0];
-    
+
             // Ver si ya existe una recomendación hoy
             const recomendacionExistente = await RecomendacionDiaria.findOne({
                 where: { usuarioId, fecha: hoy },
                 include: [Pelicula]
             });
-    
+
             if (recomendacionExistente) {
                 return res.status(200).json(recomendacionExistente.pelicula);
             }
-    
+
+            // Fecha hace 30 días
+            const hace30Dias = new Date();
+            hace30Dias.setDate(hace30Dias.getDate() - 30);
+            const fechaLimite = hace30Dias.toISOString().split('T')[0];
+
             // Obtener películas no vistas
             const vistas = await Vista.findAll({
                 where: { usuarioId },
                 attributes: ['peliculaId']
             });
             const peliculasVistasIds = vistas.map(v => v.peliculaId);
-    
+            // Películas recomendadas recientemente (últimos 30 días)
+            const recomendacionesRecientes = await RecomendacionDiaria.findAll({
+                where: {
+                    usuarioId,
+                    fecha: { [Op.gte]: fechaLimite }
+                },
+                attributes: ['peliculaId']
+            });
+            const peliculasRecientesIds = recomendacionesRecientes.map(r => r.peliculaId);
+
             const pelicula = await Pelicula.findOne({
                 where: {
-                    id: { [Op.notIn]: peliculasVistasIds }
+                    id: {
+                        [Op.and]: [
+                            { [Op.notIn]: peliculasVistasIds },
+                            { [Op.notIn]: peliculasRecientesIds }
+                        ]
+                    }
                 },
                 order: Sequelize.literal('RAND()')
             });
-    
+
             if (!pelicula) {
                 return res.status(404).json({ message: "No hay películas nuevas para recomendar." });
             }
-    
+
             // Guardar la recomendación diaria
             await RecomendacionDiaria.create({
                 usuarioId,
                 peliculaId: pelicula.id,
                 fecha: hoy
             });
-    
+
             res.status(200).json(pelicula);
-    
+
         } catch (err) {
             console.log(err)
             res.status(500).json({ error: "Error al obtener recomendación diaria" });
         }
     }
 
-    async obtenerPeliculasDestacadas(req,res){
-        try{
-            const ids=[27205,155,680,550]
+    async obtenerPeliculasDestacadas(req, res) {
+        try {
+            const ids = [27205, 155, 680, 550]
 
             const peliculas = await Pelicula.findAll({
                 where: {
                     id: ids
                 }
             });
-    
+
             res.status(200).json(peliculas);
-        }catch(e){
+        } catch (e) {
             res.status(500).json({ error: 'Error al obtener las películas destacadas' });
         }
     }

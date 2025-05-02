@@ -85,18 +85,18 @@ class vistasController {
             const usuarioId = req.userConectado.id
 
             const vista = await Vista.findOne({ where: { usuarioId, peliculaId } })
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
             if (!vista) {
-                const fechaVistaFinal = fecha_vista 
-                ? new Date(fecha_vista).toISOString().split('T')[0] 
-                : new Date().toISOString().split('T')[0];
+                const fecha_vista = new Date().toISOString().split('T')[0];
+
 
                 const nuevaVista = await Vista.create({
                     usuarioId,
                     peliculaId,
-                    calificacion:calificacion,
-                    comentarios: null,
-                    fecha_vista: fechaVistaFinal
+                    calificacion:null,
+                    comentarios: comentarios,
+                    fecha_vista: fecha_vista
                 });
     
                 return res.status(201).json({ message: "Película marcada como vista", vista: nuevaVista })
@@ -127,6 +127,20 @@ class vistasController {
     
         } catch (error) {
             res.status(500).json({ message: "Error al desmarcar película", error: error.message });
+        }
+    }
+
+    async verificarVista(req, res) {
+        try{
+            const {peliculaId} = req.params
+            const usuarioId = req.userConectado.id
+            const vista = await Vista.findOne({
+                where: { usuarioId, peliculaId }
+            });
+    
+            res.json({ vista: !!vista,calificacion: vista ? vista.calificacion : 0, comentarios: vista ? vista.comentarios : null });
+        }catch(e){
+            res.status(500).json({ e: 'Error al verificar vista' });
         }
     }
 

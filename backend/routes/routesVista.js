@@ -7,6 +7,7 @@ const route=express.Router()
 /* RUTAS /historial */
 route.get('/',verificarToken,vistaController.getAll)
 route.get('/reviews/destacadas',vistaController.getReviewsDestacadas)
+route.get('/vista/:peliculaId',verificarToken,vistaController.verificarVista)
 route.post('/marcarVista',verificarToken,vistaController.marcarVista)
 route.put('/actualizar/calificacion',verificarToken,vistaController.actualizarCalificacion)
 route.put('/actualizar/review',verificarToken,vistaController.actualizarReview)

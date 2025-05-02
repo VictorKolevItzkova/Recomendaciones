@@ -1,5 +1,42 @@
 @import "tailwindcss";
 
+@tailwind utilities;
+
+@layer utilities {
+    .animate-popIn {
+        animation: popIn 0.15s ease-in;
+    }
+
+    .animate-fadeOut {
+        animation: fadeOut 0.15s ease-in forwards;
+    }
+
+    @keyframes popIn {
+    
+        0% {
+            opacity: 0;
+            transform: scale(0.1);
+        }
+    
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    @keyframes fadeOut {
+
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.1);
+        }
+    }
+}
+
 body {
     background-color: #19191B;
     color: white;

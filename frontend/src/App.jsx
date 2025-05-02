@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes,ScrollRestoration } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 
 import Login from './pages/Login'
