@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, useRef } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 import { FaEye, FaEyeSlash, FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { AuthContext } from "../context/AuthContext";
@@ -210,8 +210,7 @@ const DetallePelicula = () => {
     const creditos = pelicula.creditos || [];
 
     const directores = creditos
-        .filter(c => c.PeliculaCredito.rol === "Director")
-        .map(c => c.nombre);
+        .filter(c => c.PeliculaCredito.rol === "Director");
 
     const actores = creditos
         .filter(c => c.PeliculaCredito.rol === "Actor")
@@ -221,6 +220,7 @@ const DetallePelicula = () => {
         .filter(c => c.PeliculaCredito.rol !== "Actor")
         .slice(0, 32);;
 
+    console.log(directores)
     return (
         <>
             <div className="relative w-full h-150">
@@ -244,7 +244,19 @@ const DetallePelicula = () => {
                         <h1 className="text-4xl font-bold mb-3 capitalize">{pelicula.title}</h1>
                         <div className="flex flex-wrap gap-4 text-md text-gray-600 mb-2">
                             <p className="text-gray-500">{pelicula.release_date}</p>
-                            <p>Dirigida por <span className="text-gray-500 underline underline-offset-2">{directores.join(", ")}</span></p>
+                            <p>
+                                Dirigida por{" "}
+                                <span className="text-gray-500 underline underline-offset-2">
+                                    {directores.map((director, index) => (
+                                        <span key={director.id}>
+                                            <Link to={`/creditos/${director.id}/peliculas/${director.PeliculaCredito.rol}`}>
+                                                {director.nombre}
+                                            </Link>
+                                            {index < directores.length - 1 && ", "}
+                                        </span>
+                                    ))}
+                                </span>
+                            </p>
                         </div>
                         <h2 className="text-xl font-semibold">Sinopsis:</h2>
                         <p className="text-lg">{pelicula.overview}</p>
@@ -279,7 +291,7 @@ const DetallePelicula = () => {
                                 <p className="font-semibold mb-1">Review</p>
                                 <button
                                     onClick={abrirModal}
-                                    className="bg-purple-600 text-white py-2 px-4 rounded-lg mt-1"
+                                    className="bg-purple-600 text-white py-2 px-4 rounded-lg mt-1 cursor-pointer hover:bg-purple-700 transition duration-200 ease-in-out"
                                 >
                                     Escribir review
                                 </button>
@@ -300,13 +312,13 @@ const DetallePelicula = () => {
                                     <div className="flex justify-end space-x-2">
                                         <button
                                             onClick={cerrarModal}
-                                            className="bg-gray-300 text-black px-4 py-2 rounded"
+                                            className="bg-gray-300 text-black px-4 py-2 rounded cursor-pointer"
                                         >
                                             Cancelar
                                         </button>
                                         <button
                                             onClick={guardarReview}
-                                            className="bg-purple-600 text-white px-4 py-2 rounded"
+                                            className="bg-purple-600 text-white px-4 py-2 rounded cursor-pointer"
                                         >
                                             Guardar
                                         </button>
@@ -323,32 +335,35 @@ const DetallePelicula = () => {
                 <div className="flex justify-center gap-4 mt-10">
                     <button
                         onClick={() => setVerCast(true)}
-                        className={`px-4 py-2 rounded-full font-semibold ${verCast ? "bg-purple-600 text-white" : "bg-gray-300 text-black"}`}
+                        className={`px-4 py-2 rounded-full font-semibold ${verCast ? "bg-purple-600 text-white" : "bg-gray-300 text-black cursor-pointer"}`}
                     >
                         Cast
                     </button>
                     <button
                         onClick={() => setVerCast(false)}
-                        className={`px-4 py-2 rounded-full font-semibold ${!verCast ? "bg-purple-600 text-white" : "bg-gray-300 text-black"}`}
+                        className={`px-4 py-2 rounded-full font-semibold ${!verCast ? "bg-purple-600 text-white" : "bg-gray-300 text-black cursor-pointer"}`}
                     >
                         Crew
                     </button>
                 </div>
                 <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 mb-15">
                     {(verCast ? actores : restoCreditos).map((persona, index) => (
-                        <div key={index} className="flex items-center gap-3 bg-gray-800 rounded-full px-4 py-2 shadow">
-                            <img
-                                src={persona.imagen || imgDefault}
-                                alt={persona.nombre}
-                                className="w-12 h-12 rounded-full object-cover"
-                            />
-                            <div>
-                                <p className="text-white text-sm font-medium">{persona.nombre}</p>
-                                {!verCast && (
-                                    <p className="text-gray-400 text-xs">{persona.PeliculaCredito.rol}</p>
-                                )}
+                        <Link to={`/creditos/${persona.id}/peliculas/${persona.PeliculaCredito.rol}`} key={persona.id}>
+                            <div key={index} className="flex items-center gap-3 bg-gray-800 rounded-full px-4 py-2 shadow">
+                                <img
+                                    src={persona.imagen || imgDefault}
+                                    alt={persona.nombre}
+                                    className="w-12 h-12 rounded-full object-cover"
+                                />
+                                <div>
+                                    <p className="text-white text-sm font-medium">{persona.nombre}</p>
+                                    {!verCast && (
+                                        <p className="text-gray-400 text-xs">{persona.PeliculaCredito.rol}</p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        </Link>
+
                     ))}
                 </div>
 

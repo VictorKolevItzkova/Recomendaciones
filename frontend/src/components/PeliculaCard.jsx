@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { FaRegStar, FaStar, FaStarHalf } from "react-icons/fa"
 import { AuthContext } from "../context/AuthContext"
@@ -38,6 +38,24 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
         if (valor >= i - 0.5) return <FaStarHalf className="text-yellow-400" />
         return <FaRegStar className="text-gray-500" />
     }
+
+    useEffect(() => {
+            const fetchHistorial = async () => {
+                try {
+                    const res = await api.get(`/historial/vista/${id}`);
+                    if (res.data.calificacion) {
+                        setCalificacion(res.data.calificacion);
+                    } else {
+                        setCalificacion(0);
+                    }
+                } catch (error) {
+                    console.error("Error al cargar historial:", error);
+                }
+            };
+    
+            fetchHistorial()
+        }, [id])
+
     return (
         <div className="relative w-64 bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300"
             onMouseEnter={() => setHovered(true)}

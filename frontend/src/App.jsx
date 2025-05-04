@@ -12,6 +12,7 @@ import MainLayout from './layouts/MainLayout'
 import NoNavLayout from './layouts/NoNavLayout'
 
 import RutaProtegida from './components/RutaProtegida'
+import CreditosPeliculas from './pages/CreditosPeliculas'
 const App = () => {
   return (
     <Router>
@@ -25,6 +26,7 @@ const App = () => {
                 <Settings />
               </RutaProtegida>} />
             <Route path='/peliculas/:id' element={<DetallePelicula />} />
+            <Route path='/creditos/:id/peliculas/:rol' element={<CreditosPeliculas />} />
           </Route>
           <Route element={<NoNavLayout />}>
             <Route path='/login' element={<Login />} />

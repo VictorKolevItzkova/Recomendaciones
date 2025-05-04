@@ -33,7 +33,7 @@ const PeliculaResultado = ({ item }) => {
                     <div className="flex flex-wrap gap-2">
                         {item.creditos.map((director) => (
                             <Link
-                                to={`/personas/${director.id}`}
+                                to={`/creditos/${director.id}/peliculas/director`}
                                 key={director.id}
                                 className="bg-gray-700 text-slate-300 px-3 py-1 rounded-md hover:bg-gray-500 hover:text-white transition-colors duration-200"
                             >

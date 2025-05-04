@@ -12,7 +12,6 @@ const Settings = () => {
     const [showModal, setShowModal] = useState(false)
 
     useEffect(() => {
-        console.log('usuario:', usuario)
         if (usuario) {
             setNombre(usuario.nombre || '')
             if (usuario.pfp) {

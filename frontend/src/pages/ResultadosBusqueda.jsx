@@ -75,7 +75,7 @@ const ResultadosBusqueda = () => {
 
     return (
         <div className="flex px-20">
-            <SideBar setSeccion={setSeccion} />
+            <SideBar setSeccion={setSeccion} seccionActual={seccion} />
             <div className="w-3/4 p-6">
                 <h2 className="text-xl mb-4">Resultados para: <strong>{query}</strong></h2>
                 <ul className="space-y-4">

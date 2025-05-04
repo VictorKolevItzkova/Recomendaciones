@@ -4,10 +4,10 @@ import { verificarToken } from '../helpers/authentication.js'
 
 const route=express.Router()
 /* RUTAS /search */
-route.get('/all/:query',verificarToken,busquedaController.buscarEnBD)
-route.get('/usuario/:query',verificarToken,busquedaController.buscarEnUsuarios)
-route.get('/pelicula/:query',verificarToken,busquedaController.buscarEnPeliculas)
-route.get('/credito/:query',verificarToken,busquedaController.buscarEnCreditos)
+route.get('/all/:query',busquedaController.buscarEnBD)
+route.get('/usuario/:query',busquedaController.buscarEnUsuarios)
+route.get('/pelicula/:query',busquedaController.buscarEnPeliculas)
+route.get('/credito/:query',busquedaController.buscarEnCreditos)
 
 
 export default route

@@ -10,18 +10,19 @@ const Register = () => {
   const [password, setPassword] = useState('')
   const [confPassword, setConfPassword] = useState('')
   const [username, setUserName] = useState('')
+  const [error, setError] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfPassword, setShowConfPassword] = useState(false)
   const navigate = useNavigate()
   const handleSubmit = async (e) => {
+    e.preventDefault()
     try {
-      e.preventDefault()
+      setError(null)
       await register(email, password, confPassword, username)
       navigate('/')
     } catch (err) {
-      console.error("Registro fallido", err)
+      setError(err)
     }
-
   }
 
   return (
@@ -45,7 +46,7 @@ const Register = () => {
               <InputField label="Contraseña" value={password} type="password" onChange={(e) => setPassword(e.target.value)} showPasswordToggle={true} />
 
               <InputField label="Confirmar Contraseña" value={confPassword} type="password" onChange={(e) => setConfPassword(e.target.value)} showPasswordToggle={true}/>
-
+              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
               <button className="cursor-pointer relative w-full inline-flex items-center justify-center p-3 font-medium rounded-md border border-transparent group bg-black/30 overflow-hidden" type="submit">
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 rounded-md blur-sm opacity-75 group-hover:opacity-100 transition duration-300 animate-pulse"></span>
                 <span className="relative z-10">Registrarse</span>

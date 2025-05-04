@@ -20,10 +20,14 @@ export const AuthProvider= ({children}) => {
   },[])
 
   const login = async (email,password)=>{
-    await api.post('/usuarios/login',
-      {email,password})
-    const response = await api.get('/usuarios/me');
-    setUsuario(response.data)
+    try{
+      await api.post('/usuarios/login',
+        {email,password})
+      const response = await api.get('/usuarios/me');
+      setUsuario(response.data)
+    }catch(err){
+      throw err.response?.data?.error || "Error al iniciar sesión";
+    }
   }
   
   const logout = async ()=>{
@@ -33,8 +37,12 @@ export const AuthProvider= ({children}) => {
   }
 
   const register = async (email,password,confPassword,nombre)=>{
-    await api.post('/usuarios/registrar',
-      {email,nombre,password,confPassword})
+    try{
+      await api.post('/usuarios/registrar',
+        {email,nombre,password,confPassword})
+    }catch(err){
+      throw err.response?.data?.error || "Error al registrar usuario";
+    }
   }
 
   const updateUser = async (formData) => {

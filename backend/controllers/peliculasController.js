@@ -351,9 +351,9 @@ class peliculasController {
                 }
 
                 return res.status(200).json({
-                    "Fila 1": filas[0] || [],
-                    "Fila 2": filas[1] || [],
-                    "Fila 3": filas[2] || []
+                    "Califica Películas": filas[0] || [],
+                    "Para Obtener": filas[1] || [],
+                    "Recomendaciones Personalizadas": filas[2] || []
                 });
             }
 

@@ -2,108 +2,115 @@ import Usuario from '../models/usuarioModel.js'
 import bcrypt from 'bcrypt'
 import { generarToken, refrescarToken } from '../helpers/authentication.js'
 import fs from 'fs'
+import { dirname } from 'path'
 import path from 'path'
-class usuariosController{
-    constructor(){}
+import { fileURLToPath } from 'url'
+class usuariosController {
+    constructor() { }
 
     /* DEVUELVE TODOS */
-    async getAll(req,res) {
-        try{
-            const usuarios=await Usuario.findAll()
+    async getAll(req, res) {
+        try {
+            const usuarios = await Usuario.findAll()
             res.status(200).json(usuarios)
-        }catch(e){
+        } catch (e) {
             res.status(500).send(e)
         }
     }
 
     /* DEVUELVE POR ID */
-    async getOne(req,res){
-        try{
-            const {id}=req.params
-            const usuario= await Usuario.findByPk(id)
+    async getOne(req, res) {
+        try {
+            const { id } = req.params
+            const usuario = await Usuario.findByPk(id)
 
-            if(!usuario){
-                return res.status(404).json({message:"Usuario no encontrado"})
+            if (!usuario) {
+                return res.status(404).json({ message: "Usuario no encontrado" })
             }
             res.status(200).json(usuario)
-        }catch(e){
+        } catch (e) {
             res.status(500).send(e)
         }
     }
 
     /* ESTABLECER ADMIN */
-    async setAdmin(req,res){
-        try{
-            const {id}=req.params
-            const adminUser=await Usuario.findOne({where:{email:req.userConectado.email}})
+    async setAdmin(req, res) {
+        try {
+            const { id } = req.params
+            const adminUser = await Usuario.findOne({ where: { email: req.userConectado.email } })
 
             /* PERMITIDO SOLO USUARIOS CON ROL ADMIN */
             if (!adminUser || adminUser.rol !== 'admin') {
                 return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
             }
 
-            const usuario= await Usuario.findByPk(id)
+            const usuario = await Usuario.findByPk(id)
 
-            if(!usuario){
-                return res.status(404).json({message:"Usuario no encontrado"})
+            if (!usuario) {
+                return res.status(404).json({ message: "Usuario no encontrado" })
             }
             await usuario.update({ rol: 'admin' });
 
             return res.json({ message: "El usuario ahora es administrador", usuario });
-        }catch(e){
+        } catch (e) {
             res.status(500).send(e)
         }
     }
 
-    async update(req,res){
-        try{
-            
-            const {nombre:nombreNuevo,newPassword}=req.body            
+    async update(req, res) {
+        try {
 
-            const usuarioExiste= await Usuario.findOne({where:{email:req.userConectado.email}})
-            
-            if(!usuarioExiste){
-                return res.status(404).json({message:"Usuario no encontrado"})
-            }            
-            
-            let rutaImagen=usuarioExiste.pfp || 'Default_pfp.png'
+            const { nombre: nombreNuevo, newPassword } = req.body
 
-            if(req.file){
-                try{
-                    if(usuarioExiste.pfp && fs.existsSync(`/uploads/images/${path.basename(usuarioExiste.pfp)}`)){
-                        fs.unlinkSync(`/uploads/images/${path.basename(usuarioExiste.pfp)}`)
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = dirname(__filename);
+
+            const usuarioExiste = await Usuario.findOne({ where: { email: req.userConectado.email } })
+
+            if (!usuarioExiste) {
+                return res.status(404).json({ message: "Usuario no encontrado" })
+            }
+
+            let rutaImagen = usuarioExiste.pfp || 'Default_pfp.png'
+
+            if (req.file) {
+                try {
+                    const oldImagePath = path.join(__dirname, '..', 'uploads', 'images', path.basename(usuarioExiste.pfp));
+
+                    if (usuarioExiste.pfp && usuarioExiste.pfp !== 'Default_pfp.png' && fs.existsSync(oldImagePath)) {
+                        fs.unlinkSync(oldImagePath);
                     }
-    
-                    rutaImagen = `${req.file.filename}`
-                }catch(e){
-                    return res.status(403).json({message:"Error al eliminar la imagen anterior"})
+
+                    rutaImagen = `${req.file.filename}`;
+                } catch (e) {
+                    return res.status(403).json({ message: "Error al eliminar la imagen anterior" });
                 }
             }
 
             const datosActualizados = {
-                nombre:nombreNuevo,
-                pfp:rutaImagen
+                nombre: nombreNuevo,
+                pfp: rutaImagen
             }
 
-            if(newPassword){
-                datosActualizados.password=await bcrypt.hash(newPassword,3)
+            if (newPassword) {
+                datosActualizados.password = await bcrypt.hash(newPassword, 3)
             }
 
             await usuarioExiste.update(datosActualizados)
-            const {id,nombre,email,rol,pfp} = usuarioExiste
-            res.status(202).json({id,nombre,email,rol,pfp})
-        }catch(e){
-            res.status(500).json({message:"Error al actualizar el usuario"})
+            const { id, nombre, email, rol, pfp } = usuarioExiste
+            res.status(202).json({ id, nombre, email, rol, pfp })
+        } catch (e) {
+            res.status(500).json({ message: "Error al actualizar el usuario" })
         }
     }
 
     /* REGISTRA USUARIO */
-    async registro(req,res){
-        try{
-            const {email,nombre,password,confPassword}=req.body
-            const usuarioExiste= await Usuario.findOne({where:{email:email}}) //Encuentra el primer match
-            if(usuarioExiste){
-                return res.status(400).json({error:"El usuario ya existe"})
+    async registro(req, res) {
+        try {
+            const { email, nombre, password, confPassword } = req.body
+            const usuarioExiste = await Usuario.findOne({ where: { email: email } }) //Encuentra el primer match
+            if (usuarioExiste) {
+                return res.status(400).json({ error: "El usuario ya existe" })
             }
 
             /*
@@ -117,113 +124,113 @@ class usuariosController{
             //     });
             // }
 
-            if(password!=confPassword){
-                return res.status(400).json({error:"Las contraseñas deben ser iguales"})
+            if (password != confPassword) {
+                return res.status(400).json({ error: "Las contraseñas deben ser iguales" })
             }
 
-            const password_encriptado=await bcrypt.hash(password,3)
+            const password_encriptado = await bcrypt.hash(password, 3)
 
-            const imagenDefecto='Default_pfp.png'
-            const data=await Usuario.create({
-                nombre:nombre,
-                email:email,
-                password:password_encriptado,
-                pfp:imagenDefecto
+            const imagenDefecto = 'Default_pfp.png'
+            const data = await Usuario.create({
+                nombre: nombre,
+                email: email,
+                password: password_encriptado,
+                pfp: imagenDefecto
             })
 
             res.status(201).json(data)
-        }catch(e){
+        } catch (e) {
             res.status(500).send(e)
         }
     }
 
     /* VERIFICA EMAIL Y PASSWORD */
-    async login(req,res){
-        try{
-            const {email,password}=req.body
-            const usuarioExiste=await Usuario.findOne({where:{email:email}})
+    async login(req, res) {
+        try {
+            const { email, password } = req.body
+            const usuarioExiste = await Usuario.findOne({ where: { email: email } })
 
-            if(!usuarioExiste){
-                return res.status(400).json({error:"El usuario no existe"})
+            if (!usuarioExiste) {
+                return res.status(400).json({ error: "El usuario no existe" })
             }
-            const passValid=await bcrypt.compare(password,usuarioExiste.password)
+            const passValid = await bcrypt.compare(password, usuarioExiste.password)
 
-            if(!passValid){
-                return res.status(400).json({error:"Password no válido"})
+            if (!passValid) {
+                return res.status(400).json({ error: "Password no válido" })
             }
 
-            const accessToken=generarToken(email)
-            const refreshToken=refrescarToken(email)
-            res.cookie('refreshToken',refreshToken,{
-                httpOnly:true,
-                secure:process.env.NODE_ENV === "production",
-                sameSite:'Strict',
+            const accessToken = generarToken(email)
+            const refreshToken = refrescarToken(email)
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: 'Strict',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
             res.status(200).json(accessToken)
-        }catch(e){
+        } catch (e) {
             res.status(500).send(e)
         }
     }
 
-    async checkPassword(req,res){
-        try{
-            const {password}=req.body
-            const usuarioExiste=await Usuario.findOne({where:{email:req.userConectado.email}})
+    async checkPassword(req, res) {
+        try {
+            const { password } = req.body
+            const usuarioExiste = await Usuario.findOne({ where: { email: req.userConectado.email } })
 
-            if(!usuarioExiste){
-                return res.status(400).json({estado:false})
+            if (!usuarioExiste) {
+                return res.status(400).json({ estado: false })
             }
-            const passValid=await bcrypt.compare(password,usuarioExiste.password)
+            const passValid = await bcrypt.compare(password, usuarioExiste.password)
 
-            if(!passValid){
-                return res.status(200).json({estado:false})
+            if (!passValid) {
+                return res.status(200).json({ estado: false })
             }
 
-            res.status(200).json({estado:true})
-        }catch(e){
+            res.status(200).json({ estado: true })
+        } catch (e) {
             res.status(500).send(e)
         }
     }
 
-    async logout(req,res){
-        try{
+    async logout(req, res) {
+        try {
             res.clearCookie('refreshToken');
-            res.json({message:'Logout exitoso'})
-        }catch(e){
+            res.json({ message: 'Logout exitoso' })
+        } catch (e) {
             res.status(500).send(e)
         }
     }
 
-    async me(req,res){
-        try{
-            if(!req.userConectado){
-                return res.status(401).json({message:'Acceso Denegado'})
+    async me(req, res) {
+        try {
+            if (!req.userConectado) {
+                return res.status(401).json({ message: 'Acceso Denegado' })
             }
-            const {id,nombre,email,rol,pfp} = req.userConectado
+            const { id, nombre, email, rol, pfp } = req.userConectado
 
-            res.json({id,nombre,email,rol,pfp})
-        }catch(e){
-            res.status(401).json({message:'Token invalido'})
-        }   
+            res.json({ id, nombre, email, rol, pfp })
+        } catch (e) {
+            res.status(401).json({ message: 'Token invalido' })
+        }
     }
 
-    async refreshToken(req,res){
-        const refreshToken=req.cookies.refreshToken
-        const email=req.userConectado.email
-        if(!req.userConectado){
-            return res.status(401).json({message:'Acceso Denegado'})
+    async refreshToken(req, res) {
+        const refreshToken = req.cookies.refreshToken
+        const email = req.userConectado.email
+        if (!req.userConectado) {
+            return res.status(401).json({ message: 'Acceso Denegado' })
         }
 
-        if(!refreshToken){
+        if (!refreshToken) {
             return res.status(401).json({ message: 'No hay refresh token' });
         }
 
-        try{
-            const newAccessToken=generarToken(email)
-            res.status(200).json({accessToken:newAccessToken})
-        }catch(e){
-            res.status(403).json({message:'Refresh Token Invalido'})
+        try {
+            const newAccessToken = generarToken(email)
+            res.status(200).json({ accessToken: newAccessToken })
+        } catch (e) {
+            res.status(403).json({ message: 'Refresh Token Invalido' })
         }
     }
 }
