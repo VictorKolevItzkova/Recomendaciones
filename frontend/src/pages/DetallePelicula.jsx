@@ -259,7 +259,7 @@ const DetallePelicula = () => {
                             {/* Vista */}
                             <div className="flex-1">
                                 <p className="font-semibold mb-2">Vista</p>
-                                <button onClick={marcarVista} className="text-3xl cursor-pointer">
+                                <button onClick={marcarVista} className="text-3xl cursor-pointer" title="Marcar/Desmarcar Vista">
                                     {vista ? <FaEye className="text-purple-500" /> : <FaEyeSlash />}
                                 </button>
                             </div>
@@ -267,7 +267,7 @@ const DetallePelicula = () => {
                             {/* Valoración */}
                             <div className="flex-1">
                                 <p className="font-semibold mb-2">Valoración</p>
-                                <div className="flex gap-1 justify-center">
+                                <div className="flex gap-1 justify-center" title="Calificar">
                                     {[1, 2, 3, 4, 5].map((i) => (
                                         <div
                                             key={i}

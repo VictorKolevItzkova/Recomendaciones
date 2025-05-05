@@ -30,16 +30,16 @@ class vistasController {
 
             const hayCalificacion = calificacion !== undefined && calificacion !== null;
             const hayComentario = comentarios && comentarios.trim() !== "";
-            
-            const fechaVistaFinal = fecha_vista 
-                ? new Date(fecha_vista).toISOString().split('T')[0] 
+
+            const fechaVistaFinal = fecha_vista
+                ? new Date(fecha_vista).toISOString().split('T')[0]
                 : new Date().toISOString().split('T')[0];
 
             const nuevaVista = await Vista.create({
                 usuarioId,
                 peliculaId,
-                calificacion:hayCalificacion ? calificacion : null,
-                comentarios:hayComentario ? comentarios : null,
+                calificacion: hayCalificacion ? calificacion : null,
+                comentarios: hayComentario ? comentarios : null,
                 fecha_vista: fechaVistaFinal
             });
 
@@ -51,7 +51,7 @@ class vistasController {
 
     async actualizarCalificacion(req, res) {
         try {
-            const { peliculaId,calificacion } = req.body
+            const { peliculaId, calificacion } = req.body
             const usuarioId = req.userConectado.id
 
             const vista = await Vista.findOne({ where: { usuarioId, peliculaId } })
@@ -62,11 +62,11 @@ class vistasController {
                 const nuevaVista = await Vista.create({
                     usuarioId,
                     peliculaId,
-                    calificacion:calificacion,
+                    calificacion: calificacion,
                     comentarios: null,
                     fecha_vista: fecha_vista
                 });
-    
+
                 return res.status(201).json({ message: "Película marcada como vista", vista: nuevaVista })
             }
 
@@ -85,7 +85,6 @@ class vistasController {
             const usuarioId = req.userConectado.id
 
             const vista = await Vista.findOne({ where: { usuarioId, peliculaId } })
-            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
             if (!vista) {
                 const fecha_vista = new Date().toISOString().split('T')[0];
@@ -94,11 +93,11 @@ class vistasController {
                 const nuevaVista = await Vista.create({
                     usuarioId,
                     peliculaId,
-                    calificacion:null,
+                    calificacion: null,
                     comentarios: comentarios,
                     fecha_vista: fecha_vista
                 });
-    
+
                 return res.status(201).json({ message: "Película marcada como vista", vista: nuevaVista })
             }
 
@@ -114,32 +113,32 @@ class vistasController {
         try {
             const { peliculaId } = req.body;
             const usuarioId = req.userConectado.id;
-    
+
             const vista = await Vista.findOne({ where: { usuarioId, peliculaId } });
-    
+
             if (!vista) {
                 return res.status(404).json({ message: "La película no está marcada como vista" });
             }
-    
+
             await vista.destroy();
-    
+
             res.status(200).json({ message: "Película desmarcada como vista, calificación y reseña eliminadas" });
-    
+
         } catch (error) {
             res.status(500).json({ message: "Error al desmarcar película", error: error.message });
         }
     }
 
     async verificarVista(req, res) {
-        try{
-            const {peliculaId} = req.params
+        try {
+            const { peliculaId } = req.params
             const usuarioId = req.userConectado.id
             const vista = await Vista.findOne({
                 where: { usuarioId, peliculaId }
             });
-    
-            res.json({ vista: !!vista,calificacion: vista ? vista.calificacion : 0, comentarios: vista ? vista.comentarios : null });
-        }catch(e){
+
+            res.status(200).json({ vista: !!vista, calificacion: vista ? vista.calificacion : 0, comentarios: vista ? vista.comentarios : null });
+        } catch (e) {
             res.status(500).json({ e: 'Error al verificar vista' });
         }
     }
@@ -149,20 +148,53 @@ class vistasController {
             const reviews = await Vista.findAll({
                 where: {
                     comentarios: {
-                      [Op.ne]: null,
+                        [Op.ne]: null,
                     },
-                  },
+                },
                 include: [
-                    { model: Usuario, attributes: ['id','nombre', 'pfp'] },
-                    { model: Pelicula, attributes: ['id','title', 'poster_path','release_date'] },
+                    { model: Usuario, attributes: ['id', 'nombre', 'pfp'] },
+                    { model: Pelicula, attributes: ['id', 'title', 'poster_path', 'release_date'] },
                 ],
                 order: Sequelize.literal('RAND()'),
                 limit: 6,
             });
 
-            res.json(reviews);
+            res.status(200).json(reviews);
         } catch (err) {
             res.status(500).json({ error: 'Error al obtener las reseñas' });
+        }
+    }
+
+    async getDiario(req, res) {
+        try {
+            const usuarioId = req.userConectado.id
+            const { page = 1, limit = 10 } = req.query;
+
+            const offset = (page - 1) * limit;
+
+            const totalVistas = await Vista.count({
+                where: { usuarioId: usuarioId },
+            });
+
+            const vistas = await Vista.findAll({
+                where: { usuarioId: usuarioId },
+                include: [{ model: Pelicula }],
+                limit: parseInt(limit), // Limitar el número de registros por página
+                offset: parseInt(offset), // Desplazamiento de la página
+                order:[
+                    ["fecha_vista", "DESC"]
+                ]
+            });
+
+            const totalPages = Math.ceil(totalVistas / limit);
+            res.status(200).json({
+                vistas,
+                totalPages, // Enviar el total de páginas junto con los datos
+                currentPage: parseInt(page), // Enviar la página actual
+                totalVistas, // Enviar el total de vistas
+            });
+        } catch (e) {
+            res.status(500).json({ error: 'Error al obtener el historial' });
         }
     }
 }

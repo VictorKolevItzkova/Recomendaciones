@@ -17,7 +17,7 @@ const NavBar = () => {
                     {usuario && (
                         <>
                             <Link
-                                to="/"
+                                to="/diario"
                                 className="hidden md:block mx-4 hover:text-slate-300 transition py-2 px-4 border rounded-md"
                             >
                                 Diario

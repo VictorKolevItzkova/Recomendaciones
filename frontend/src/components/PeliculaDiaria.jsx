@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 const PeliculaDiaria = ({ id, titulo, imagen, sinopsis }) => {
     return (
         <Link to={`/peliculas/${id}`}>
-            <div className="relative w-full rounded-2xl overflow-hidden shadow-lg">
+            <div className="relative w-full rounded-2xl overflow-hidden shadow-lg" title={titulo}>
                 <img
                     src={imagen}
                     alt={titulo}

@@ -7,12 +7,14 @@ import ResultadosBusqueda from './pages/ResultadosBusqueda'
 import Settings from './pages/Settings'
 import DetallePelicula from './pages/DetallePelicula'
 import HomeRedirect from './pages/HomeRedirect'
+import CreditosPeliculas from './pages/CreditosPeliculas'
+import Diario from './pages/Diario'
 
 import MainLayout from './layouts/MainLayout'
 import NoNavLayout from './layouts/NoNavLayout'
 
 import RutaProtegida from './components/RutaProtegida'
-import CreditosPeliculas from './pages/CreditosPeliculas'
+
 const App = () => {
   return (
     <Router>
@@ -25,6 +27,11 @@ const App = () => {
               <RutaProtegida>
                 <Settings />
               </RutaProtegida>} />
+            <Route path='/diario' element={
+              <RutaProtegida>
+                <Diario />
+              </RutaProtegida>
+            }/>
             <Route path='/peliculas/:id' element={<DetallePelicula />} />
             <Route path='/creditos/:id/peliculas/:rol' element={<CreditosPeliculas />} />
           </Route>

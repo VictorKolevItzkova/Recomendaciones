@@ -5,7 +5,7 @@ import { verificarToken } from '../helpers/authentication.js'
 const route=express.Router()
 
 /* RUTAS /historial */
-route.get('/',verificarToken,vistaController.getAll)
+route.get('/diario',verificarToken,vistaController.getDiario)
 route.get('/reviews/destacadas',vistaController.getReviewsDestacadas)
 route.get('/vista/:peliculaId',verificarToken,vistaController.verificarVista)
 route.post('/marcarVista',verificarToken,vistaController.marcarVista)

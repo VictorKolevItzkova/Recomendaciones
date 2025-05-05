@@ -63,6 +63,7 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
                 setHovered(false)
                 setHoverValue(0)
             }}
+            title={titulo}
         >
             <Link to={`/peliculas/${id}`}>
                 <img
