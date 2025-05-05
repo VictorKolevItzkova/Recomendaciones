@@ -4,6 +4,7 @@ import api from "../api/axiosConfig"
 import PeliculaCard from "../components/PeliculaCard"
 
 import imgDefault from "../assets/DefaultCredito.png"
+import EsqueletoCreditosPeliculas from "../esqueletos/EsqueletoCreditosPeliculas"
 const CreditosPeliculas = () => {
     const { id, rol } = useParams()
     const [peliculas, setPeliculas] = useState([])
@@ -24,7 +25,7 @@ const CreditosPeliculas = () => {
     }, [id, rol])
 
     if (!credito || !peliculas) {
-        return <div>Cargando...</div>
+        return <EsqueletoCreditosPeliculas />
     }
     return (
         <div className="bg-gray-900 text-white py-8 px-4">

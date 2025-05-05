@@ -2,9 +2,12 @@ import { useEffect, useState } from "react"
 import api from "../api/axiosConfig"
 import PeliculaDiaria from "../components/PeliculaDiaria"
 import CarruselGenero from "../components/CarruselGenero"
+import EsqueletoPeliculaDiaria from "../esqueletos/EsqueletoPeliculaDiaria";
+import EsqueletoCarruselGenero from "../esqueletos/EsqueletoCarruselGenero";
 const RecomendacionPage = () => {
   const [recomendacionDiaria, setRecomendacionDiaria] = useState(null)
   const [recomendacion, setRecomendacion] = useState({})
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchRecomendacionDiaria = async () => {
@@ -31,6 +34,24 @@ const RecomendacionPage = () => {
 
     fetchRecomendacion()
   }, [])
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <main>
+        <section className="p-20">
+          <div className="h-12 w-1/3 bg-gray-400 rounded mb-10 ml-130"></div>
+          <EsqueletoPeliculaDiaria />
+        </section>
+        <section className="mb-10">
+          <EsqueletoCarruselGenero />
+        </section>
+      </main>
+    );
+  }
   return (
     <main>
       <section className="p-20">

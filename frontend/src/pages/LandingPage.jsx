@@ -42,12 +42,12 @@ const LandingPage = () => {
                     <div className="my-15 flex items-center gap-10">
                         <button 
                             onClick={() => navigate("/register")}
-                            className="w-full bg-white py-4 rounded-full text-black font-bold hover:bg-blue-500 hover:text-white transition duration-300 flex items-center justify-center gap-2">
+                            className="w-full cursor-pointer bg-white py-4 rounded-full text-black font-bold hover:bg-blue-500 hover:text-white transition duration-300 flex items-center justify-center gap-2">
                             <MailPlus /> Regístrate
                         </button>
                         <button 
                             onClick={() => navigate("/login")}
-                            className="w-full bg-white py-4 rounded-full text-black font-bold hover:bg-blue-500 hover:text-white transition duration-300 flex items-center justify-center gap-2">
+                            className="w-full cursor-pointer bg-white py-4 rounded-full text-black font-bold hover:bg-blue-500 hover:text-white transition duration-300 flex items-center justify-center gap-2">
                             <MailCheck /> Sign In
                         </button>
                     </div>

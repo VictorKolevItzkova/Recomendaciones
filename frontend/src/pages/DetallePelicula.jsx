@@ -6,11 +6,16 @@ import { AuthContext } from "../context/AuthContext";
 import api from "../api/axiosConfig"
 import DondeVer from "../components/DondeVer"
 import imgDefault from "../assets/DefaultCredito.png"
+import EsqueletoDetallePelicula from "../esqueletos/EsqueletoDetallePelicula";
 const DetallePelicula = () => {
     const { id } = useParams()
     const { usuario } = useContext(AuthContext)
 
     const [pelicula, setPelicula] = useState(null)
+    const [creditos, setCreditos] = useState(null)
+    const [directores, setDirectores] = useState(null)
+    const [actores, setActores] = useState(null)
+    const [restoCreditos, setRestoCreditos] = useState(null)
     const [vista, setVista] = useState(false);
     const [hoverValue, setHoverValue] = useState(0);
     const [calificacion, setCalificacion] = useState(0);
@@ -137,6 +142,10 @@ const DetallePelicula = () => {
             try {
                 const response = await api.get(`/peliculas/select/${id}`)
                 setPelicula(response.data)
+                setCreditos(response.data.creditos)
+                setDirectores(response.data.creditos.filter(c => c.PeliculaCredito.rol === "Director"))
+                setActores(response.data.creditos.filter(c => c.PeliculaCredito.rol === "Actor").slice(0, 32))
+                setRestoCreditos(response.data.creditos.filter(c => c.PeliculaCredito.rol !== "Actor").slice(0, 32))
             } catch (error) {
                 console.error("Error fetching movie details:", error)
             }
@@ -203,24 +212,10 @@ const DetallePelicula = () => {
         };
     }, [modalAbierto]);
 
-    if (!pelicula) {
-        return <div>Cargando...</div>
+    if (!pelicula && !creditos && !directores && !actores && !restoCreditos) {
+        return <EsqueletoDetallePelicula />
     }
 
-    const creditos = pelicula.creditos || [];
-
-    const directores = creditos
-        .filter(c => c.PeliculaCredito.rol === "Director");
-
-    const actores = creditos
-        .filter(c => c.PeliculaCredito.rol === "Actor")
-        .slice(0, 32);
-
-    const restoCreditos = creditos
-        .filter(c => c.PeliculaCredito.rol !== "Actor")
-        .slice(0, 32);;
-
-    console.log(directores)
     return (
         <>
             <div className="relative w-full h-150">
