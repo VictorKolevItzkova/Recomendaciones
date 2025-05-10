@@ -4,7 +4,7 @@ const PeliculaDiaria = ({ id, titulo, imagen, sinopsis }) => {
         <Link to={`/peliculas/${id}`}>
             <div className="relative w-full rounded-2xl overflow-hidden shadow-lg" title={titulo}>
                 <img
-                    src={imagen}
+                    src={`https://image.tmdb.org/t/p/original/${imagen}`}
                     alt={titulo}
                     className="w-full h-[40rem] object-cover object-center"
                 />

@@ -14,35 +14,35 @@ const NavBar = () => {
                 <Link to="/" className="text-2xl font-bold">MatchIT</Link>
                 <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} navigate={navigate} />
                 <div className="flex justify-center items-center">
-                    {usuario && (
-                        <>
-                            <Link
-                                to="/diario"
-                                className="hidden md:block mx-4 hover:text-slate-300 transition py-2 px-4 border rounded-md"
-                            >
-                                Diario
-                            </Link>
-                            <Link to="/settings">
-                                <img className='hidden md:block mx-4 bg-white rounded-full w-12 h-12' src={`${baseImgUrl}${usuario.pfp}`} alt="" />
-                            </Link>
-                        </>
-
-                    )}
-                    {!usuario && (
-                        <>
-                            <Link
-                                to="/register"
-                                className='hidden md:block mx-4 hover:text-slate-300 transition py-2'
-                            >
-                                Registrarse
-                            </Link>
-                            <Link
-                                to="/login"
-                                className="hidden md:block mx-4 hover:text-slate-300 transition border px-4 py-2 rounded-md"
-                            >
-                                Log in
-                            </Link>
-                        </>
+                    {usuario === undefined ? null : (
+                        usuario ? (
+                            <>
+                                <Link
+                                    to="/diario"
+                                    className="hidden md:block mx-4 hover:text-slate-300 transition py-2 px-4 border rounded-md"
+                                >
+                                    Diario
+                                </Link>
+                                <Link to="/settings">
+                                    <img className='hidden md:block mx-4 bg-white rounded-full w-12 h-12' src={`${baseImgUrl}${usuario.pfp}`} alt="" />
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link
+                                    to="/register"
+                                    className='hidden md:block mx-4 hover:text-slate-300 transition py-2'
+                                >
+                                    Registrarse
+                                </Link>
+                                <Link
+                                    to="/login"
+                                    className="hidden md:block mx-4 hover:text-slate-300 transition border px-4 py-2 rounded-md"
+                                >
+                                    Log in
+                                </Link>
+                            </>
+                        )
                     )}
                 </div>
             </div>

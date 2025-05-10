@@ -5,7 +5,7 @@ const PeliculaResultado = ({ item }) => {
             {/* Poster de la película */}
             <Link to={`/peliculas/${item.id}`}>
                 <img
-                    src={`${item.poster_path}`}
+                    src={`https://image.tmdb.org/t/p/w300/${item.poster_path}`}
                     alt={item.title}
                     className="w-32 h-auto rounded-lg object-cover"
                 />

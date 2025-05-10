@@ -3,13 +3,12 @@ import { useParams, Link } from "react-router-dom"
 import { FaEye, FaEyeSlash, FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { AuthContext } from "../context/AuthContext";
-import api from "../api/axiosConfig"
 import DondeVer from "../components/DondeVer"
 import imgDefault from "../assets/DefaultCredito.png"
 import EsqueletoDetallePelicula from "../esqueletos/EsqueletoDetallePelicula";
 const DetallePelicula = () => {
     const { id } = useParams()
-    const { usuario } = useContext(AuthContext)
+    const { usuario,api } = useContext(AuthContext)
 
     const [pelicula, setPelicula] = useState(null)
     const [creditos, setCreditos] = useState(null)
@@ -23,6 +22,8 @@ const DetallePelicula = () => {
     const [review, setReview] = useState("");
     const [modalAbierto, setModalAbierto] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoaded, setIsLoaded] = useState(true);
 
     const dialogRef = useRef(null);
 
@@ -54,6 +55,7 @@ const DetallePelicula = () => {
     }
 
     const marcarVista = async () => {
+        if (!usuario) return
         if (vista) {
             await api.delete('/historial/eliminar', {
                 data: {
@@ -115,6 +117,7 @@ const DetallePelicula = () => {
 
     const guardarReview = async () => {
         try {
+            if (!usuario) return
             const response = await api.put("/historial/actualizar/review", {
                 comentarios: review,
                 peliculaId: id,
@@ -137,44 +140,50 @@ const DetallePelicula = () => {
             console.error("Error al enviar la reseña:", error);
         }
     };
+
     useEffect(() => {
-        const fetchPelicula = async () => {
+        const inicio = Date.now();
+        const delayMinimo = 500;
+
+        const fetchData = async () => {
             try {
-                const response = await api.get(`/peliculas/select/${id}`)
-                setPelicula(response.data)
-                setCreditos(response.data.creditos)
-                setDirectores(response.data.creditos.filter(c => c.PeliculaCredito.rol === "Director"))
-                setActores(response.data.creditos.filter(c => c.PeliculaCredito.rol === "Actor").slice(0, 32))
-                setRestoCreditos(response.data.creditos.filter(c => c.PeliculaCredito.rol !== "Actor").slice(0, 32))
+                const peliculaRes = await api.get(`/peliculas/select/${id}`);
+                const data = peliculaRes.data;
+                const creditos = data.creditos;
+
+                setPelicula(data);
+                setCreditos(creditos);
+                setDirectores(creditos.filter(c => c.PeliculaCredito.rol === "Director"));
+                setActores(creditos.filter(c => c.PeliculaCredito.rol === "Actor").slice(0, 32));
+                setRestoCreditos(creditos.filter(c => c.PeliculaCredito.rol !== "Actor").slice(0, 32));
+
+                if (!usuario) return
+                const historialRes = await api.get(`/historial/vista/${id}`);
+
+                setVista(historialRes.data.vista);
+                setCalificacion(historialRes.data.calificacion || 0);
+                setReview(historialRes.data.comentarios || "");
+                setIsLoading(false)
             } catch (error) {
-                console.error("Error fetching movie details:", error)
-            }
-        }
-
-        const fetchHistorial = async () => {
-            try {
-                const res = await api.get(`/historial/vista/${id}`);
-                setVista(res.data.vista);
-                if (res.data.calificacion) {
-                    setCalificacion(res.data.calificacion);
-                } else {
+                if(error.response?.status===401 || error.response?.status===403){
+                    setVista(false);
                     setCalificacion(0);
-                }
-
-                if (res.data.comentarios) {
-                    setReview(res.data.comentarios);
-                } else {
                     setReview("");
                 }
+                console.error("Error al cargar datos:", error);
+            } finally {
+                const tiempoTranscurrido = Date.now() - inicio;
+                const tiempoRestante = delayMinimo - tiempoTranscurrido;
 
-            } catch (error) {
-                console.error("Error al cargar historial:", error);
+                setTimeout(() => setIsLoaded(false), Math.max(0, tiempoRestante));
+                setIsLoading(true)
             }
         };
 
-        fetchHistorial();
-        fetchPelicula()
-    }, [id])
+        setIsLoaded(true)
+        fetchData();
+    }, [id]);
+
 
     useEffect(() => {
         const dialog = dialogRef.current;
@@ -212,15 +221,14 @@ const DetallePelicula = () => {
         };
     }, [modalAbierto]);
 
-    if (!pelicula && !creditos && !directores && !actores && !restoCreditos) {
-        return <EsqueletoDetallePelicula />
-    }
+    if (isLoading && isLoaded) return <EsqueletoDetallePelicula />;
+
 
     return (
         <>
             <div className="relative w-full h-150">
                 <img
-                    src={pelicula.backdrop_path}
+                    src={`https://image.tmdb.org/t/p/original/${pelicula.backdrop_path}`}
                     alt="Backdrop"
                     className="w-full h-full object-cover rounded-b-xl"
                 />
@@ -231,7 +239,7 @@ const DetallePelicula = () => {
                 <div className="flex items-start justify-between gap-6">
                     {/* Imagen */}
                     <div className="flex-shrink-0">
-                        <img src={pelicula.poster_path} alt={pelicula.title} className="rounded-xl w-60" />
+                        <img src={`https://image.tmdb.org/t/p/w500/${pelicula.poster_path}`} alt={pelicula.title} className="rounded-xl w-60" />
                     </div>
 
                     {/* Info */}
@@ -346,7 +354,7 @@ const DetallePelicula = () => {
                         <Link to={`/creditos/${persona.id}/peliculas/${persona.PeliculaCredito.rol}`} key={persona.id}>
                             <div key={index} className="flex items-center gap-3 bg-gray-800 rounded-full px-4 py-2 shadow">
                                 <img
-                                    src={persona.imagen || imgDefault}
+                                    src={persona.imagen ? `https://image.tmdb.org/t/p/w300/${persona.imagen}` : imgDefault}
                                     alt={persona.nombre}
                                     className="w-12 h-12 rounded-full object-cover"
                                 />

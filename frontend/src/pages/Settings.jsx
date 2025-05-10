@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../context/AuthContext'
+import EsqueletoSettings from '../esqueletos/EsqueletoSettings'
+
 const Settings = () => {
     const { usuario, api, logout, updateUser } = useContext(AuthContext)
 
@@ -10,15 +12,29 @@ const Settings = () => {
     const [pfp, setPfp] = useState('')
     const [preview, setPreview] = useState('')
     const [showModal, setShowModal] = useState(false)
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (usuario) {
-            setNombre(usuario.nombre || '')
-            if (usuario.pfp) {
-                setPreview(`http://localhost:5100/uploads/images/${usuario.pfp}`)
+        const delayMinimo = 500;
+        const inicio = Date.now();
+    
+        const cargarUsuario = async () => {
+            if (usuario) {
+                setNombre(usuario.nombre || '');
+                if (usuario.pfp) {
+                    setPreview(`http://localhost:5100/uploads/images/${usuario.pfp}`);
+                }
             }
-        }
-    }, [usuario])
+    
+            const tiempoTranscurrido = Date.now() - inicio;
+            const tiempoRestante = delayMinimo - tiempoTranscurrido;
+    
+            setTimeout(() => setIsLoading(false), Math.max(0, tiempoRestante));
+        };
+    
+        setIsLoading(true);
+        cargarUsuario();
+    }, [usuario]);
 
     const handleFileChange = (e) => {
         const file = e.target.files[0]
@@ -57,6 +73,10 @@ const Settings = () => {
         } catch (err) {
             console.log('Error al actualizar usuario:', err)
         }
+    }
+
+    if (isLoading) {
+        return <EsqueletoSettings />
     }
 
     return (

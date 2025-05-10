@@ -42,6 +42,7 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
     useEffect(() => {
             const fetchHistorial = async () => {
                 try {
+                    if (!usuario) return
                     const res = await api.get(`/historial/vista/${id}`);
                     if (res.data.calificacion) {
                         setCalificacion(res.data.calificacion);
@@ -67,7 +68,7 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
         >
             <Link to={`/peliculas/${id}`}>
                 <img
-                    src={imagen}
+                    src={`https://image.tmdb.org/t/p/w300/${imagen}`}
                     alt={titulo}
                     className="w-full h-64 object-cover"
                 />

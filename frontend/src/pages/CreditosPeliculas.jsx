@@ -31,7 +31,7 @@ const CreditosPeliculas = () => {
         <div className="bg-gray-900 text-white py-8 px-4">
             <div className="flex flex-col items-center">
                 <img
-                    src={credito.imagen ? credito.imagen : imgDefault}
+                    src={credito.imagen ? `https://image.tmdb.org/t/p/original/${credito.imagen}` : imgDefault}
                     alt={credito.nombre}
                     className="w-40 h-40 rounded-full object-cover mb-6"
                 />

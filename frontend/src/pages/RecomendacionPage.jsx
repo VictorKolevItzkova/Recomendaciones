@@ -8,38 +8,38 @@ const RecomendacionPage = () => {
   const [recomendacionDiaria, setRecomendacionDiaria] = useState(null)
   const [recomendacion, setRecomendacion] = useState({})
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(true);
 
   useEffect(() => {
-    const fetchRecomendacionDiaria = async () => {
+    const fetchData = async () => {
+      const inicio = Date.now();
+      const delayMinimo = 500;
+  
       try {
-        const response = await api.get('/peliculas/recomendacionDiaria')
-        setRecomendacionDiaria(response.data)
+        const [resDiaria, resGeneral] = await Promise.all([
+          api.get('/peliculas/recomendacionDiaria'),
+          api.get('/peliculas/recomendacion')
+        ]);
+  
+        setRecomendacionDiaria(resDiaria.data);
+        setRecomendacion(resGeneral.data);
+        setIsLoading(false)
       } catch (error) {
-        console.error('Error fetching recomendacion:', error)
+        console.error('Error al obtener recomendaciones:', error);
+      } finally {
+        const tiempoTranscurrido = Date.now() - inicio;
+        const tiempoRestante = delayMinimo - tiempoTranscurrido;
+  
+        setTimeout(() => setIsLoaded(false), Math.max(0, tiempoRestante));
+        setIsLoading(true)
       }
-    }
-
-    fetchRecomendacionDiaria()
-  }, [])
-
-  useEffect(() => {
-    const fetchRecomendacion = async () => {
-      try {
-        const response = await api.get('/peliculas/recomendacion')
-        setRecomendacion(response.data)
-      } catch (error) {
-        console.error('Error fetching recomendacion:', error)
-      }
-    }
-
-    fetchRecomendacion()
-  }, [])
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
+    };
+  
+    setIsLoaded(true)
+    fetchData();
   }, []);
 
-  if (isLoading) {
+  if (isLoading && isLoaded) {
     return (
       <main>
         <section className="p-20">

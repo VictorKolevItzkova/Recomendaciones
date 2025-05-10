@@ -5,6 +5,8 @@ import fs from 'fs'
 import { dirname } from 'path'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import jsonwebtoken from 'jsonwebtoken'
+
 class usuariosController {
     constructor() { }
 
@@ -216,21 +218,23 @@ class usuariosController {
     }
 
     async refreshToken(req, res) {
-        const refreshToken = req.cookies.refreshToken
-        const email = req.userConectado.email
-        if (!req.userConectado) {
-            return res.status(401).json({ message: 'Acceso Denegado' })
-        }
-
+        const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
-            return res.status(401).json({ message: 'No hay refresh token' });
+            return res.status(400).json({ message: 'No hay refresh token' });
         }
-
+    
         try {
-            const newAccessToken = generarToken(email)
-            res.status(200).json({ accessToken: newAccessToken })
+            const decoded = jsonwebtoken.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+            const newAccessToken = generarToken(decoded.email);
+            res.status(200).json({ accessToken: newAccessToken });
         } catch (e) {
-            res.status(403).json({ message: 'Refresh Token Invalido' })
+            if (e.name === 'JsonWebTokenError') {
+                return res.status(403).json({ message: 'Refresh Token Inválido' });
+            }
+            if (e.name === 'TokenExpiredError') {
+                return res.status(403).json({ message: 'Refresh Token Expirado' });
+            }
+            return res.status(500).json({ message: 'Error al verificar el refresh token', error: e.message });
         }
     }
 }

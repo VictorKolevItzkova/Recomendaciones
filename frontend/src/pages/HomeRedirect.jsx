@@ -9,16 +9,15 @@ const HomeRedirect = () => {
   const [esperando, setEsperando] = useState(true);
 
   useEffect(() => {
-    // Aplica un delay antes de mostrar cualquier contenido
     const timeout = setTimeout(() => {
       setEsperando(false);
-    }, 50); // 500ms de delay, ajústalo a lo que necesites
+    }, 200);
 
     return () => clearTimeout(timeout);
   }, []);
 
   if (esperando) {
-    return <div></div>; // o un loader/spinner si lo deseas
+    return <div></div>;
   }
   return usuario ? <RecomendacionPage /> : <LandingPage />;
 };

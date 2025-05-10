@@ -28,7 +28,7 @@ const PeliculasDestacadas = () => {
                         key={pelicula.id}
                         id={pelicula.id}
                         titulo={pelicula.title}
-                        imagen={`${pelicula.poster_path}`}
+                        imagen={pelicula.poster_path}
                     />
                 ))}
             </div>

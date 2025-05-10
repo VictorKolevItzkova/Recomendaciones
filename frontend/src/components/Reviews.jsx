@@ -34,7 +34,7 @@ const Reviews = () => {
                             {/* Poster de la película */}
                             <Link to={`/peliculas/${review.pelicula.id}`}>
                                 <img
-                                    src={`${review.pelicula.poster_path}`}
+                                    src={`https://image.tmdb.org/t/p/w500/${review.pelicula.poster_path}`}
                                     alt={review.pelicula.title}
                                     className="w-32 h-auto rounded-lg object-cover"
                                 />

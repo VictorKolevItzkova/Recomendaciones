@@ -132,9 +132,10 @@ class peliculasController {
                 return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
             }
 
+            const {inicio,totalPages}=req.body
+
             const endpoints = ['now_playing', 'popular', 'top_rated'];
             const peliculas = [];
-            const totalPages = 10;
 
             /* EVITA QUE BLOQUEEN LA API */
             const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -202,7 +203,7 @@ class peliculasController {
 
             // Obtener películas de los diferentes endpoints
             for (const endpoint of endpoints) {
-                for (let page = 1; page <= totalPages; page++) {
+                for (let page = inicio; page <= totalPages; page++) {
                     const peliculasPorPagina = await fetchData(endpoint, page);
                     peliculas.push(...peliculasPorPagina);
 
@@ -214,13 +215,17 @@ class peliculasController {
 
             // Insertar las películas en la base de datos
             for (const peli of peliculas) {
+                console.log(1)
                 const existe = await Pelicula.findByPk(peli.id);
 
                 if (!existe) {
                     try {
+                        await delay(300);
                         let movieDetails = await fetchMovieDetails(peli.id);
                         if (movieDetails) {
+                            await delay(300);
                             let castDetails = await fetchCreditDetails(peli.id);
+                            await delay(300);
                             let crewDetail = await fetchCrewDetails(peli.id)
                             await delay(500)
                             const nuevaPelicula = await Pelicula.create({
@@ -229,8 +234,8 @@ class peliculasController {
                                 title: movieDetails.title,
                                 overview: movieDetails.overview,
                                 release_date: movieDetails.release_date,
-                                poster_path: movieDetails.poster_path ? `https://image.tmdb.org/t/p/original${movieDetails.poster_path}` : null,
-                                backdrop_path: movieDetails.backdrop_path ? `https://image.tmdb.org/t/p/original${movieDetails.backdrop_path}` : null,
+                                poster_path: movieDetails.poster_path ? movieDetails.poster_path : null,
+                                backdrop_path: movieDetails.backdrop_path ? movieDetails.backdrop_path : null,
                                 duracion: movieDetails.runtime
                             });
                             if (movieDetails.genres) {
@@ -249,7 +254,7 @@ class peliculasController {
                                         actor = await Credito.create({
                                             id: detalles.id,
                                             nombre: detalles.original_name,
-                                            imagen: detalles.profile_path ? `https://image.tmdb.org/t/p/original${detalles.profile_path}` : null
+                                            imagen: detalles.profile_path ? detalles.profile_path : null
                                         })
                                     }
                                     await nuevaPelicula.addCredito(actor, { through: { rol: "Actor" } })
@@ -263,12 +268,13 @@ class peliculasController {
                                         crew = await Credito.create({
                                             id: detalles.id,
                                             nombre: detalles.original_name,
-                                            imagen: detalles.profile_path ? `https://image.tmdb.org/t/p/original${detalles.profile_path}` : null
+                                            imagen: detalles.profile_path ? detalles.profile_path : null
                                         })
                                     }
                                     await nuevaPelicula.addCredito(crew, { through: { rol: detalles.job } })
                                 }
                             }
+                            console.log(nuevaPelicula)
                         }
                     } catch (error) {
                         console.error(`Error al obtener datos de ${peli.title}:`, error.message);
@@ -327,7 +333,7 @@ class peliculasController {
     async obtenerRecomendaciones(req, res) {
         try {
             const usuarioId = req.userConectado.id
-            // Obtener los géneros favoritos del usuario
+            // Obtener las películas vistas del usuario
             const vistas = await Vista.findAll({
                 where: { usuarioId },
                 include: [

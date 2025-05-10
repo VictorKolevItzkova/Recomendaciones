@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
-import { NotebookPen,SquareChevronLeft,SquareChevronRight } from "lucide-react";
+import { NotebookPen, SquareChevronLeft, SquareChevronRight } from "lucide-react";
 import api from "../api/axiosConfig";
+import EsqueletoDiario from '../esqueletos/EsqueletoDiario'
 
 const Diario = () => {
     const [vistas, setVistas] = useState([]);
@@ -13,6 +14,8 @@ const Diario = () => {
     const [review, setReview] = useState("");
     const [selectedPeliculaId, setSelectedPeliculaId] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoaded, setIsLoaded] = useState(true);
 
     const dialogRef = useRef(null)
 
@@ -122,18 +125,32 @@ const Diario = () => {
         }
     };
 
-    const cargarVistas = async (page = 1) => {
-        try {
-            const res = await api.get("/historial/diario", {
-                params: { page, limit: 10 }, // Enviar los parámetros de paginación
-            });
-            setVistas(res.data.vistas);
-            setTotalPages(res.data.totalPages);
-            setCurrentPage(res.data.currentPage);
-        } catch (err) {
-            console.error("Error al cargar el diario:", err);
-        }
-    };
+    useEffect(() => {
+        const delayMinimo = 500;
+        const inicio = Date.now();
+
+        const cargar = async () => {
+            try {
+                const res = await api.get("/historial/diario", {
+                    params: { page: currentPage, limit: 10 },
+                });
+                setVistas(res.data.vistas);
+                setTotalPages(res.data.totalPages);
+                setCurrentPage(res.data.currentPage);
+                setIsLoading(false)
+            } catch (err) {
+                console.error("Error al cargar el diario:", err);
+            } finally {
+                const tiempoTranscurrido = Date.now() - inicio;
+                const tiempoRestante = delayMinimo - tiempoTranscurrido;
+                setTimeout(() => setIsLoaded(false), Math.max(0, tiempoRestante));
+                setIsLoading(true)
+            }
+        };
+
+        setIsLoaded(true);
+        cargar();
+    }, [currentPage]);
 
     const cambiarPagina = (page) => {
         if (page >= 1 && page <= totalPages) {
@@ -141,10 +158,9 @@ const Diario = () => {
         }
     };
 
-    useEffect(() => {
-        cargarVistas(currentPage);
-    }, [currentPage]);
-
+    if (isLoading && isLoaded) {
+        return <EsqueletoDiario />
+    }
     return (
         <div className="bg-[#121212] min-h-screen text-white p-10">
             <h1 className="text-3xl font-bold mb-6">Diario</h1>
@@ -173,16 +189,16 @@ const Diario = () => {
                                 >
                                     <td className="px-2 py-4 font-semibold text-blue-400">{mes}</td>
                                     <td className="px-2 font-bold text-lg">{dia}</td>
-                                    <Link to={`/peliculas/${v.peliculaId}`} title={v.pelicula.title}>
-                                        <td className="flex items-center gap-4 px-2 py-2">
+                                    <td >
+                                        <Link to={`/peliculas/${v.peliculaId}`} title={v.pelicula.title} className="flex items-center gap-4 px-2 py-2">
                                             <img
-                                                src={`${v.pelicula.poster_path}`}
+                                                src={`https://image.tmdb.org/t/p/w300/${v.pelicula.poster_path}`}
                                                 alt={v.titulo}
                                                 className="w-12 h-16 object-cover rounded"
                                             />
                                             <span className="text-white font-semibold text-2xl">{v.pelicula.title}</span>
-                                        </td>
-                                    </Link>
+                                        </Link>
+                                    </td>
 
                                     <td className="text-gray-400">{new Date(v.pelicula.release_date).getFullYear()}</td>
                                     <td>

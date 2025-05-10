@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 const CarruselGenero = ({ genero, peliculas }) => {
     const carruselRef = useRef(null)
     const [isHovered, setIsHovered] = useState(false)
-    
+
     const handleScroll = (direction) => {
         if (carruselRef.current) {
             const scrollAmount = 800
@@ -44,7 +44,8 @@ const CarruselGenero = ({ genero, peliculas }) => {
                     ))}
                 </div>
                 <div className={`group absolute top-1/2 right-0 transform -translate-y-1/2 cursor-pointer z-10 h-[300px] flex items-center justify-center
-                ${isHovered ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 bg-black/50 px-4 rounded-tl-[10px] rounded-bl-[10px]`} onClick={() => handleScroll('right')}>
+                ${isHovered ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 bg-black/50 px-4 rounded-tl-[10px] rounded-bl-[10px]`}
+                    onClick={() => handleScroll('right')}>
                     <button className="cursor-pointer transition-transform duration-300 group-hover:scale-125">
                         <ChevronRight />
                     </button>

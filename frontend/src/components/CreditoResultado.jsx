@@ -19,7 +19,7 @@ const CreditoResultado = ({ item }) => {
         <div className="flex flex-col sm:flex-row gap-4 bg-[#161b22] rounded-2xl p-4 shadow-md">
             {/* Poster de la Credito */}
             <img
-                src={item.imagen ? item.imagen : imgDefault}
+                src={item.imagen ? `https://image.tmdb.org/t/p/w500/${item.imagen}` : imgDefault}
                 alt={item.nombre}
                 className="w-24 h-auto rounded-lg object-cover"
             />
@@ -33,12 +33,13 @@ const CreditoResultado = ({ item }) => {
                 <div className="mt-4">
                     <p className="text-gray-400 mb-2">Roles</p>
                     <div className="flex flex-wrap gap-2">
-                        {rolesLimitados.map((rol, index) => (
+                        {rolesLimitados.map((rol) => (
                             <Link
                                 to={`/creditos/${item.id}/peliculas/${rol}`}
+                                key={item.id}
                             >
                                 <h3
-                                    key={index}
+                                    
                                     className="bg-gray-700 text-slate-300 px-3 py-1 rounded-md hover:bg-gray-500 hover:text-white transition-colors duration-200"
                                 >
                                     {rol}
