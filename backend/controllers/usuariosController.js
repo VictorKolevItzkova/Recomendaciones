@@ -110,6 +110,9 @@ class usuariosController {
     async registro(req, res) {
         try {
             const { email, nombre, password, confPassword } = req.body
+            if (!email || !nombre || !password || !confPassword) {
+                return res.status(400).json({ error: "Todos los campos son obligatorios" });
+            }
             const usuarioExiste = await Usuario.findOne({ where: { email: email } }) //Encuentra el primer match
             if (usuarioExiste) {
                 return res.status(400).json({ error: "El usuario ya existe" })

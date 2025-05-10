@@ -55,13 +55,13 @@ const Footer = () => {
                     <div className='text-sm text-white'>
                         <span>© {currentYear} MatchIT, Inc.</span>
                         <button
-                            className='hover:text-slate-300 mx-2'
+                            className='hover:text-slate-300 mx-2 cursor-pointer'
                             onClick={() => openModal('about')}
                         >
                             About
                         </button>
                         <button
-                            className='hover:text-slate-300 mx-2'
+                            className='hover:text-slate-300 mx-2 cursor-pointer'
                             onClick={() => openModal('privacy')}
                         >
                             Privacy Terms
