@@ -6,6 +6,7 @@ import { AuthContext } from "../context/AuthContext";
 import DondeVer from "../components/DondeVer"
 import imgDefault from "../assets/DefaultCredito.png"
 import EsqueletoDetallePelicula from "../esqueletos/EsqueletoDetallePelicula";
+import { Helmet } from "react-helmet";
 const DetallePelicula = () => {
     const { id } = useParams()
     const { usuario,api } = useContext(AuthContext)
@@ -226,6 +227,9 @@ const DetallePelicula = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Peliculas</title>
+            </Helmet>
             <div className="relative w-full h-150">
                 <img
                     src={`https://image.tmdb.org/t/p/original/${pelicula.backdrop_path}`}

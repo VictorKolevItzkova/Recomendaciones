@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
+import { Helmet } from "react-helmet"
 import api from "../api/axiosConfig"
 import PeliculaCard from "../components/PeliculaCard"
 
@@ -28,26 +29,31 @@ const CreditosPeliculas = () => {
         return <EsqueletoCreditosPeliculas />
     }
     return (
-        <div className="bg-gray-900 text-white py-8 px-4">
-            <div className="flex flex-col items-center">
-                <img
-                    src={credito.imagen ? `https://image.tmdb.org/t/p/original/${credito.imagen}` : imgDefault}
-                    alt={credito.nombre}
-                    className="w-40 h-40 rounded-full object-cover mb-6"
-                />
-                <h1 className="text-3xl font-semibold mb-4">{credito.nombre}</h1>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {peliculas.map(pelicula => (
-                        <PeliculaCard
-                            key={pelicula.id}
-                            id={pelicula.id}
-                            titulo={pelicula.title}
-                            imagen={pelicula.poster_path}
-                        />
-                    ))}
+        <>
+            <Helmet>
+                <title>Creditos</title>
+            </Helmet>
+            <div className="bg-gray-900 text-white py-8 px-4">
+                <div className="flex flex-col items-center">
+                    <img
+                        src={credito.imagen ? `https://image.tmdb.org/t/p/original/${credito.imagen}` : imgDefault}
+                        alt={credito.nombre}
+                        className="w-40 h-40 rounded-full object-cover mb-6"
+                    />
+                    <h1 className="text-3xl font-semibold mb-4">{credito.nombre}</h1>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {peliculas.map(pelicula => (
+                            <PeliculaCard
+                                key={pelicula.id}
+                                id={pelicula.id}
+                                titulo={pelicula.title}
+                                imagen={pelicula.poster_path}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

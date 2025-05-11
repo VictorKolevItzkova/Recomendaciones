@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { NotebookPen, SquareChevronLeft, SquareChevronRight } from "lucide-react";
+import { Helmet } from "react-helmet";
 import api from "../api/axiosConfig";
 import EsqueletoDiario from '../esqueletos/EsqueletoDiario'
 
@@ -162,122 +163,127 @@ const Diario = () => {
         return <EsqueletoDiario />
     }
     return (
-        <div className="bg-[#121212] min-h-screen text-white p-10">
-            <h1 className="text-3xl font-bold mb-6">Diario</h1>
-            <div className="overflow-x-auto px-15">
-                <table className="w-full table-fixed border-separate border-spacing-y-3">
-                    <thead className="text-gray-400 text-sm uppercase text-left">
-                        <tr>
-                            <th className="w-20">Month</th>
-                            <th className="w-16">Day</th>
-                            <th className="min-w-[200px]">Film</th>
-                            <th className="w-16">Year</th>
-                            <th className="w-32 text-center">Rating</th>
-                            <th className="w-20 text-center">Review</th>
-                            <th className="w-20 text-center">Viewed</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {vistas.map((v) => {
-                            const fecha = new Date(v.fecha_vista);
-                            const mes = fecha.toLocaleString("default", { month: "short" }).toUpperCase();
-                            const dia = fecha.getDate();
-                            return (
-                                <tr
-                                    key={v.peliculaId}
-                                    className="bg-[#1a1a1a] hover:bg-[#222] rounded-lg"
-                                >
-                                    <td className="px-2 py-4 font-semibold text-blue-400">{mes}</td>
-                                    <td className="px-2 font-bold text-lg">{dia}</td>
-                                    <td >
-                                        <Link to={`/peliculas/${v.peliculaId}`} title={v.pelicula.title} className="flex items-center gap-4 px-2 py-2">
-                                            <img
-                                                src={`https://image.tmdb.org/t/p/w300/${v.pelicula.poster_path}`}
-                                                alt={v.titulo}
-                                                className="w-12 h-16 object-cover rounded"
-                                            />
-                                            <span className="text-white font-semibold text-2xl">{v.pelicula.title}</span>
-                                        </Link>
-                                    </td>
+        <>
+            <Helmet>
+                <title>Diario</title>
+            </Helmet>
+            <div className="bg-[#121212] min-h-screen text-white p-10">
+                <h1 className="text-3xl font-bold mb-6">Diario</h1>
+                <div className="overflow-x-auto px-15">
+                    <table className="w-full table-fixed border-separate border-spacing-y-3">
+                        <thead className="text-gray-400 text-sm uppercase text-left">
+                            <tr>
+                                <th className="w-20">Month</th>
+                                <th className="w-16">Day</th>
+                                <th className="min-w-[200px]">Film</th>
+                                <th className="w-16">Year</th>
+                                <th className="w-32 text-center">Rating</th>
+                                <th className="w-20 text-center">Review</th>
+                                <th className="w-20 text-center">Viewed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {vistas.map((v) => {
+                                const fecha = new Date(v.fecha_vista);
+                                const mes = fecha.toLocaleString("default", { month: "short" }).toUpperCase();
+                                const dia = fecha.getDate();
+                                return (
+                                    <tr
+                                        key={v.peliculaId}
+                                        className="bg-[#1a1a1a] hover:bg-[#222] rounded-lg"
+                                    >
+                                        <td className="px-2 py-4 font-semibold text-blue-400">{mes}</td>
+                                        <td className="px-2 font-bold text-lg">{dia}</td>
+                                        <td >
+                                            <Link to={`/peliculas/${v.peliculaId}`} title={v.pelicula.title} className="flex items-center gap-4 px-2 py-2">
+                                                <img
+                                                    src={`https://image.tmdb.org/t/p/w300/${v.pelicula.poster_path}`}
+                                                    alt={v.titulo}
+                                                    className="w-12 h-16 object-cover rounded"
+                                                />
+                                                <span className="text-white font-semibold text-2xl">{v.pelicula.title}</span>
+                                            </Link>
+                                        </td>
 
-                                    <td className="text-gray-400">{new Date(v.pelicula.release_date).getFullYear()}</td>
-                                    <td>
-                                        <div className="flex justify-center items-center gap-1 h-full">
-                                            {renderEstrellasInteractivas(v.calificacion, v.peliculaId)}
-                                        </div>
-                                    </td>
-                                    <td className="text-center">
-                                        <button
-                                            onClick={() => abrirModal(v.peliculaId, v.comentarios)}
-                                            title="Escribir review"
-                                            className="text-xl cursor-pointer"
-                                        >
-                                            <NotebookPen />
-                                        </button>
-                                    </td>
-                                    <td className="text-center">
-                                        <button onClick={() => desmarcarVista(v.peliculaId)} className="text-2xl cursor-pointer" title="Desmarcar como vista">
-                                            <FaEye className="text-purple-500" />
-                                        </button>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-                <dialog
-                    ref={dialogRef}
-                    className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 w-full max-w-md border shadow-lg backdrop:bg-black/50 transition-all duration-200 ease-out
+                                        <td className="text-gray-400">{new Date(v.pelicula.release_date).getFullYear()}</td>
+                                        <td>
+                                            <div className="flex justify-center items-center gap-1 h-full">
+                                                {renderEstrellasInteractivas(v.calificacion, v.peliculaId)}
+                                            </div>
+                                        </td>
+                                        <td className="text-center">
+                                            <button
+                                                onClick={() => abrirModal(v.peliculaId, v.comentarios)}
+                                                title="Escribir review"
+                                                className="text-xl cursor-pointer"
+                                            >
+                                                <NotebookPen />
+                                            </button>
+                                        </td>
+                                        <td className="text-center">
+                                            <button onClick={() => desmarcarVista(v.peliculaId)} className="text-2xl cursor-pointer" title="Desmarcar como vista">
+                                                <FaEye className="text-purple-500" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                    <dialog
+                        ref={dialogRef}
+                        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 w-full max-w-md border shadow-lg backdrop:bg-black/50 transition-all duration-200 ease-out
                     ${modalVisible ? "animate-popIn" : ""}`}
-                >
-                    <h2 className="text-lg font-bold mb-4">Escribe tu reseña</h2>
-                    <textarea
-                        className="w-full p-2 border border-gray-300 rounded mb-4 resize-none text-black"
-                        rows="5"
-                        value={review}
-                        onChange={(e) => setReview(e.target.value)}
-                        placeholder="Escribe tu reseña aquí..."
-                    ></textarea>
-                    <div className="flex justify-end space-x-2">
+                    >
+                        <h2 className="text-lg font-bold mb-4">Escribe tu reseña</h2>
+                        <textarea
+                            className="w-full p-2 border border-gray-300 rounded mb-4 resize-none text-black"
+                            rows="5"
+                            value={review}
+                            onChange={(e) => setReview(e.target.value)}
+                            placeholder="Escribe tu reseña aquí..."
+                        ></textarea>
+                        <div className="flex justify-end space-x-2">
+                            <button
+                                onClick={cerrarModal}
+                                className="bg-gray-300 text-black px-4 py-2 rounded cursor-pointer"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={guardarReview}
+                                className="bg-purple-600 text-white px-4 py-2 rounded cursor-pointer"
+                            >
+                                Guardar
+                            </button>
+                        </div>
+                    </dialog>
+                    <div className="flex justify-center items-center gap-6 mt-8 text-xl">
                         <button
-                            onClick={cerrarModal}
-                            className="bg-gray-300 text-black px-4 py-2 rounded cursor-pointer"
+                            onClick={() => cambiarPagina(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className={`transition-colors ${currentPage === 1 ? "text-gray-500 cursor-not-allowed" : "text-cyan-400 hover:text-cyan-300"
+                                }`}
+                            title="Anterior"
                         >
-                            Cancelar
+                            <SquareChevronLeft />
                         </button>
+                        <span className="text-white font-medium">
+                            Página {currentPage} de {totalPages}
+                        </span>
                         <button
-                            onClick={guardarReview}
-                            className="bg-purple-600 text-white px-4 py-2 rounded cursor-pointer"
+                            onClick={() => cambiarPagina(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className={`transition-colors ${currentPage === totalPages ? "text-gray-500 cursor-not-allowed" : "text-purple-400 hover:text-purple-300"
+                                }`}
+                            title="Siguiente"
                         >
-                            Guardar
+                            <SquareChevronRight />
                         </button>
                     </div>
-                </dialog>
-                <div className="flex justify-center items-center gap-6 mt-8 text-xl">
-                    <button
-                        onClick={() => cambiarPagina(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className={`transition-colors ${currentPage === 1 ? "text-gray-500 cursor-not-allowed" : "text-cyan-400 hover:text-cyan-300"
-                            }`}
-                        title="Anterior"
-                    >
-                        <SquareChevronLeft />
-                    </button>
-                    <span className="text-white font-medium">
-                        Página {currentPage} de {totalPages}
-                    </span>
-                    <button
-                        onClick={() => cambiarPagina(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className={`transition-colors ${currentPage === totalPages ? "text-gray-500 cursor-not-allowed" : "text-purple-400 hover:text-purple-300"
-                            }`}
-                        title="Siguiente"
-                    >
-                        <SquareChevronRight />
-                    </button>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
