@@ -20,7 +20,7 @@ const __dirname=path.dirname(__filename)
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(cors({
-    origin:'http://localhost:5173',
+    origin: process.env.REACT_URL,
     credentials:true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
