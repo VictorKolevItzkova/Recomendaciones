@@ -73,13 +73,13 @@ class usuariosController {
                 return res.status(404).json({ message: "Usuario no encontrado" })
             }
 
-            let rutaImagen = usuarioExiste.pfp || 'Default_pfp.png'
+            let rutaImagen = usuarioExiste.pfp || 'Default_pfp.jpg'
 
             if (req.file) {
                 try {
                     const oldImagePath = path.join(__dirname, '..', 'uploads', 'images', path.basename(usuarioExiste.pfp));
 
-                    if (usuarioExiste.pfp && usuarioExiste.pfp !== 'Default_pfp.png' && fs.existsSync(oldImagePath)) {
+                    if (usuarioExiste.pfp && usuarioExiste.pfp !== 'Default_pfp.jpg' && fs.existsSync(oldImagePath)) {
                         fs.unlinkSync(oldImagePath);
                     }
 
@@ -172,7 +172,7 @@ class usuariosController {
                 sameSite: 'Strict',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
-            res.status(200).json(accessToken)
+            res.status(200).json({accessToken})
         } catch (e) {
             res.status(500).send(e)
         }

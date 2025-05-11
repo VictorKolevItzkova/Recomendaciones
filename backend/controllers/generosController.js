@@ -10,12 +10,14 @@ class generosController{
     async create(req,res){
         try{
             const adminUserEmail = req.userConectado;
-            const adminUser = await Usuario.findOne({ where: { email: adminUserEmail } });
+            console.log(adminUserEmail)
+            const adminUser = await Usuario.findOne({ where: { email: adminUserEmail.email } });
     
             if (!adminUser || adminUser.rol !== 'admin') {
                 return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
             }
 
+            console.log("Admin")
             /* DEVUELVE GENEROS */
             const response = await axios.get(
                 `https://api.themoviedb.org/3/genre/movie/list?language=es`,

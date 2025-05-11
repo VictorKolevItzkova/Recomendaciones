@@ -132,8 +132,10 @@ class peliculasController {
                 return res.status(403).json({ message: "No tienes permisos para realizar esta acción" });
             }
 
-            const {inicio,totalPages}=req.body
+            const {inicio,totalPages}=req.query
 
+            console.log(inicio)
+            console.log(totalPages)
             const endpoints = ['now_playing', 'popular', 'top_rated'];
             const peliculas = [];
 
