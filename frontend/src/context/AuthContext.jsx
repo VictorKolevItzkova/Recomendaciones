@@ -69,8 +69,8 @@ export const AuthProvider = ({ children }) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setUsuario(response.data); // Actualizamos el usuario con los nuevos datos
-    } catch (error) {
-      console.error("Error actualizando el perfil:", error);
+    } catch (err) {
+      throw err.response?.data?.error || "Error actualizando el perfil";
     }
   };
 

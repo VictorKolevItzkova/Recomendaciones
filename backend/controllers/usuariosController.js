@@ -94,7 +94,15 @@ class usuariosController {
                 pfp: rutaImagen
             }
 
+
+
             if (newPassword) {
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,100}$/;
+                if (!passwordRegex.test(newPassword)) {
+                    return res.status(400).json({
+                        error: "La contraseña debe tener entre 6 y 100 caracteres, al menos 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial, y no puede contener espacios."
+                    });
+                }
                 datosActualizados.password = await bcrypt.hash(newPassword, 3)
             }
 
@@ -172,7 +180,7 @@ class usuariosController {
                 sameSite: 'Strict',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
-            res.status(200).json({accessToken})
+            res.status(200).json({ accessToken })
         } catch (e) {
             res.status(500).send(e)
         }
@@ -225,7 +233,7 @@ class usuariosController {
         if (!refreshToken) {
             return res.status(400).json({ message: 'No hay refresh token' });
         }
-    
+
         try {
             const decoded = jsonwebtoken.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
             const newAccessToken = generarToken(decoded.email);

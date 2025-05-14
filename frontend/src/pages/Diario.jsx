@@ -109,13 +109,13 @@ const Diario = () => {
         try {
             await api.put("/historial/actualizar/review", {
                 peliculaId: selectedPeliculaId,
-                comentarios,
+                comentarios:review,
             });
 
             setVistas((prev) =>
                 prev.map((v) =>
                     v.peliculaId === selectedPeliculaId
-                        ? { ...v, comentarios }
+                        ? { ...v, comentarios:review }
                         : v
                 )
             );

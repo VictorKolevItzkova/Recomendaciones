@@ -15,6 +15,8 @@ const Settings = () => {
     const [preview, setPreview] = useState('')
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null)
+    const [errorVerificar, setErrorVerificar] = useState(null)
 
     useEffect(() => {
         const delayMinimo = 500;
@@ -50,6 +52,9 @@ const Settings = () => {
             if (res.data.estado) {
                 setIsPasswordValid(true)
                 setShowModal(false)
+                setErrorVerificar(null)
+            }else{
+                setErrorVerificar("Contraseña no válida")
             }
         } catch (err) {
             console.log(err)
@@ -69,11 +74,12 @@ const Settings = () => {
         }
 
         try {
-            updateUser(formData)
+            setError(null)
+            await updateUser(formData)
             setNombre(formData.get('nombre'))
             setShowModal(false)
         } catch (err) {
-            console.log('Error al actualizar usuario:', err)
+            setError(err)
         }
     }
 
@@ -145,14 +151,20 @@ const Settings = () => {
                                 />
                             </>
                         )}
+                        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-                        <button
-                            type="button"
-                            onClick={() => setShowModal(true)}
-                            className="bg-blue-600 text-white px-4 py-2 rounded"
-                        >
-                            Cambiar contraseña
-                        </button>
+                        {!isPasswordValid && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowModal(true)
+                                    setError(null)
+                                }}
+                                className="bg-blue-600 text-white px-4 py-2 rounded"
+                            >
+                                Cambiar contraseña
+                            </button>
+                        )}
                     </form>
                 </div>
 
@@ -182,6 +194,7 @@ const Settings = () => {
                                         onChange={(e) => setPasswordActual(e.target.value)}
                                         className="text-black border rounded w-full px-2 py-1 mb-4"
                                     />
+                                    {errorVerificar && <p className="text-red-500 text-sm text-left mb-1">{errorVerificar}</p>}
                                     <button
                                         onClick={verificarPassword}
                                         className="bg-blue-600 text-white px-4 py-1 rounded"
