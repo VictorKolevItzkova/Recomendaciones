@@ -28,6 +28,7 @@ route.post('/checkPassword',verificarToken,usuarioController.checkPassword)
 route.post('/refresh',usuarioController.refreshToken)
 route.get('/me',verificarToken,usuarioController.me)
 route.put('/admin/:id',verificarToken,usuarioController.setAdmin)
+route.delete('/',verificarToken,usuarioController.delete)
 
 
 export default route

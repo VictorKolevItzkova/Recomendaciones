@@ -243,7 +243,7 @@ const DetallePelicula = () => {
                 <div className="flex items-start justify-between gap-6">
                     {/* Imagen */}
                     <div className="flex-shrink-0">
-                        <img src={`https://image.tmdb.org/t/p/w500/${pelicula.poster_path}`} alt={pelicula.title} className="rounded-xl w-60" />
+                        <img src={pelicula.poster_path ? `https://image.tmdb.org/t/p/w500/${pelicula.poster_path}`:imgDefault} alt={pelicula.title} className="rounded-xl w-60" />
                     </div>
 
                     {/* Info */}

@@ -73,6 +73,11 @@ class usuariosController {
                 return res.status(404).json({ message: "Usuario no encontrado" })
             }
 
+            const usuarioNombre = await Usuario.findOne({ where: { nombre: nombreNuevo } }) 
+            if (usuarioNombre) {
+                return res.status(400).json({ error: "Nombre de Usuario no Disponible. Elija otro" })
+            }
+
             let rutaImagen = usuarioExiste.pfp || 'Default_pfp.jpg'
 
             if (req.file) {
@@ -123,19 +128,23 @@ class usuariosController {
             }
             const usuarioExiste = await Usuario.findOne({ where: { email: email } }) //Encuentra el primer match
             if (usuarioExiste) {
-                return res.status(400).json({ error: "El usuario ya existe" })
+                return res.status(400).json({ error: "El correo ya existe" })
+            }
+            const usuarioNombre = await Usuario.findOne({ where: { nombre: nombre } }) 
+            if (usuarioNombre) {
+                return res.status(400).json({ error: "Nombre de Usuario no Disponible. Elija otro" })
             }
 
             /*
                 CONTRASEÑA SEGURA
             */
 
-            // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,100}$/;
-            // if (!passwordRegex.test(password)) {
-            //     return res.status(400).json({
-            //         error: "La contraseña debe tener entre 6 y 100 caracteres, al menos 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial, y no puede contener espacios."
-            //     });
-            // }
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>_])[A-Za-z\d!@#$%^&*(),.?":{}|<>_]{6,100}$/;
+            if (!passwordRegex.test(password)) {
+                return res.status(400).json({
+                    error: "La contraseña debe tener entre 6 y 100 caracteres, al menos 1 mayúscula, 1 minúscula, 1 número, 1 carácter especial, y no puede contener espacios."
+                });
+            }
 
             if (password != confPassword) {
                 return res.status(400).json({ error: "Las contraseñas deben ser iguales" })
@@ -143,7 +152,7 @@ class usuariosController {
 
             const password_encriptado = await bcrypt.hash(password, 3)
 
-            const imagenDefecto = 'Default_pfp.png'
+            const imagenDefecto = 'Default_pfp.jpg'
             const data = await Usuario.create({
                 nombre: nombre,
                 email: email,
@@ -212,6 +221,19 @@ class usuariosController {
             res.json({ message: 'Logout exitoso' })
         } catch (e) {
             res.status(500).send(e)
+        }
+    }
+
+    async delete(req, res) {
+        try{
+            const usuarioExiste = await Usuario.findOne({ where: { email: req.userConectado.email } })
+            if (!usuarioExiste) {
+                return res.status(404).json({ error: "Usuario no encontrado" })
+            }
+            usuarioExiste.destroy()
+            res.status(200).json({ message: "Usuario eliminado" })
+        }catch(e){
+            res.status((500).json({ error: "Error al eliminar el usuario" }))
         }
     }
 

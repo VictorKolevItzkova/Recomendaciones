@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom"
+import imgDefault from "../assets/defaultCredito.jpg"
 const PeliculaResultado = ({ item }) => {
     return (
         <div className="flex flex-col sm:flex-row gap-4 bg-[#161b22] rounded-2xl p-4 shadow-md">
             {/* Poster de la película */}
             <Link to={`/peliculas/${item.id}`}>
-                <img
-                    src={`https://image.tmdb.org/t/p/w300/${item.poster_path}`}
+                <img                
+                    src={item.poster_path ? `https://image.tmdb.org/t/p/w300/${item.poster_path}`:imgDefault}
                     alt={item.title}
                     className="w-32 h-auto rounded-lg object-cover"
                 />

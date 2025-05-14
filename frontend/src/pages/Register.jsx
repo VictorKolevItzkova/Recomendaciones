@@ -19,7 +19,7 @@ const Register = () => {
     try {
       setError(null)
       await register(email, password, confPassword, username)
-      navigate('/')
+      navigate('/',{state:{cuentaRegistrada:true}})
     } catch (err) {
       setError(err)
     }

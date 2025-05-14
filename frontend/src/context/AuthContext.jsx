@@ -74,8 +74,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const deleteUser = async () => {
+    try {
+      await api.delete('/usuarios');
+      logout();
+    } catch (err) {
+      throw err.response?.data?.error || "Error al eliminar el usuario";
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ usuario, login, logout, register, updateUser, api }}>
+    <AuthContext.Provider value={{ usuario, login, logout, register, updateUser, deleteUser, api }}>
       {children}
     </AuthContext.Provider>
   )

@@ -1,12 +1,29 @@
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate, Link, useLocation } from "react-router-dom"
 import herobg from "../assets/heroBg.png"
 import herobgMv from "../assets/heroBgMv.png"
 import { MailPlus, MailCheck } from "lucide-react"
 import Reviews from "../components/Reviews"
 import PeliculasDestacadas from "../components/PeliculasDestacadas"
 import { Helmet } from "react-helmet";
+import { useEffect } from "react"
+import Swal from "sweetalert2"
 const LandingPage = () => {
     const navigate = useNavigate()
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state?.cuentaRegistrada) {
+            Swal.fire({
+                icon: "success",
+                title: "¡Cuenta registrada!",
+                text: "Tu cuenta ha sido registrada correctamente.",
+                confirmButtonColor: "#7e22ce",
+            })
+
+            // Limpiar el estado para evitar mostrar el mensaje al recargar
+            window.history.replaceState({}, document.title)
+        }
+    }, [location.state])
     return (
         <>
             <Helmet>

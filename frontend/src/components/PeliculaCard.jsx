@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { FaRegStar, FaStar, FaStarHalf } from "react-icons/fa"
 import { AuthContext } from "../context/AuthContext"
 import api from "../api/axiosConfig"
+import imgDefault from "../assets/defaultCredito.jpg"
 const PeliculaCard = ({ id, titulo, imagen }) => {
     const [hovered, setHovered] = useState(false)
     const [hoverValue, setHoverValue] = useState(0)
@@ -24,7 +25,7 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
         const value = mouseX < width / 2 ? index - 0.5 : index
 
         try {
-            const response = await api.put('/historial/actualizar/calificacion', {peliculaId: id, calificacion: value})
+            const response = await api.put('/historial/actualizar/calificacion', { peliculaId: id, calificacion: value })
 
             setCalificacion(value)
         } catch (error) {
@@ -40,22 +41,22 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
     }
 
     useEffect(() => {
-            const fetchHistorial = async () => {
-                try {
-                    if (!usuario) return
-                    const res = await api.get(`/historial/vista/${id}`);
-                    if (res.data.calificacion) {
-                        setCalificacion(res.data.calificacion);
-                    } else {
-                        setCalificacion(0);
-                    }
-                } catch (error) {
-                    console.error("Error al cargar historial:", error);
+        const fetchHistorial = async () => {
+            try {
+                if (!usuario) return
+                const res = await api.get(`/historial/vista/${id}`);
+                if (res.data.calificacion) {
+                    setCalificacion(res.data.calificacion);
+                } else {
+                    setCalificacion(0);
                 }
-            };
-    
-            fetchHistorial()
-        }, [id])
+            } catch (error) {
+                console.error("Error al cargar historial:", error);
+            }
+        };
+
+        fetchHistorial()
+    }, [id])
 
     return (
         <div className="relative w-64 bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300"
@@ -68,7 +69,7 @@ const PeliculaCard = ({ id, titulo, imagen }) => {
         >
             <Link to={`/peliculas/${id}`}>
                 <img
-                    src={`https://image.tmdb.org/t/p/w300/${imagen}`}
+                    src={imagen ? `https://image.tmdb.org/t/p/w300/${imagen}` : imgDefault}
                     alt={titulo}
                     className="w-full h-64 object-cover"
                 />

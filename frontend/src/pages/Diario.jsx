@@ -5,6 +5,7 @@ import { NotebookPen, SquareChevronLeft, SquareChevronRight } from "lucide-react
 import { Helmet } from "react-helmet";
 import api from "../api/axiosConfig";
 import EsqueletoDiario from '../esqueletos/EsqueletoDiario'
+import imgDefault from "../assets/DefaultCredito.png"
 
 const Diario = () => {
     const [vistas, setVistas] = useState([]);
@@ -197,7 +198,7 @@ const Diario = () => {
                                         <td >
                                             <Link to={`/peliculas/${v.peliculaId}`} title={v.pelicula.title} className="flex items-center gap-4 px-2 py-2">
                                                 <img
-                                                    src={`https://image.tmdb.org/t/p/w300/${v.pelicula.poster_path}`}
+                                                    src={v.pelicula.poster_path ? `https://image.tmdb.org/t/p/w300/${v.pelicula.poster_path}` : imgDefault}
                                                     alt={v.titulo}
                                                     className="w-12 h-16 object-cover rounded"
                                                 />

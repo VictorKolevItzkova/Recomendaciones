@@ -469,6 +469,12 @@ class peliculasController {
                             { [Op.notIn]: peliculasVistasIds },
                             { [Op.notIn]: peliculasRecientesIds }
                         ]
+                    },
+                    backdrop_path: {
+                        [Op.and]: [
+                            { [Op.ne]: null },
+                            { [Op.ne]: '' }
+                        ]
                     }
                 },
                 order: Sequelize.literal('RAND()')
