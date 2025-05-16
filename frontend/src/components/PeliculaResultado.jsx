@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import imgDefault from "../assets/defaultCredito.jpg"
+import imgDefault from "../assets/DefaultCredito.png"
 const PeliculaResultado = ({ item }) => {
     return (
         <div className="flex flex-col sm:flex-row gap-4 bg-[#161b22] rounded-2xl p-4 shadow-md">

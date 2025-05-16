@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { FaRegStar, FaStar, FaStarHalf } from "react-icons/fa"
 import { AuthContext } from "../context/AuthContext"
 import api from "../api/axiosConfig"
-import imgDefault from "../assets/defaultCredito.jpg"
+import imgDefault from "../assets/DefaultCredito.png"
 const PeliculaCard = ({ id, titulo, imagen }) => {
     const [hovered, setHovered] = useState(false)
     const [hoverValue, setHoverValue] = useState(0)

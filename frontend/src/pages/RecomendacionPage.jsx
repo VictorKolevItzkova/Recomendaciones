@@ -60,8 +60,8 @@ const RecomendacionPage = () => {
       </Helmet>
 
       <main>
-        <section className="p-20">
-          <h1 className="text-center text-6xl font-bold leading-tight mb-4">
+        <section className="px-20 py-10">
+          <h1 className="text-center text-6xl font-bold leading-tight mb-3">
             Recomendación <span className="text-pink-500">Diaria</span>
           </h1>
           <div className="p-10">

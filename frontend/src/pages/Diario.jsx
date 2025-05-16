@@ -16,6 +16,7 @@ const Diario = () => {
     const [review, setReview] = useState("");
     const [selectedPeliculaId, setSelectedPeliculaId] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalAbierto, setModalAbierto] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoaded, setIsLoaded] = useState(true);
 
@@ -93,30 +94,43 @@ const Diario = () => {
     };
 
     const abrirModal = (peliculaId, textoReview) => {
+        if (!dialogRef.current) return;
+
+        dialogRef.current?.classList.remove("animate-fadeOut");
+        dialogRef.current?.classList.add("animate-popIn");
+        dialogRef.current?.showModal();
         setReview(textoReview || "");
         setSelectedPeliculaId(peliculaId);
+        setModalAbierto(true);
         setModalVisible(true);
-        setTimeout(() => dialogRef.current?.showModal(), 0);
     };
 
     const cerrarModal = () => {
-        dialogRef.current?.close();
-        setModalVisible(false);
+        if (!dialogRef.current) return;
+
         setReview("");
         setSelectedPeliculaId(null);
+        dialogRef.current.classList.add("animate-fadeOut");
+        setTimeout(() => {
+            dialogRef.current?.close();
+            dialogRef.current?.classList.remove("animate-popIn");
+            dialogRef.current?.classList.remove("animate-fadeOut");
+            setModalAbierto(false);
+            setModalVisible(false);
+        }, 150);
     };
 
     const guardarReview = async () => {
         try {
             await api.put("/historial/actualizar/review", {
                 peliculaId: selectedPeliculaId,
-                comentarios:review,
+                comentarios: review,
             });
 
             setVistas((prev) =>
                 prev.map((v) =>
                     v.peliculaId === selectedPeliculaId
-                        ? { ...v, comentarios:review }
+                        ? { ...v, comentarios: review }
                         : v
                 )
             );
@@ -153,6 +167,41 @@ const Diario = () => {
         setIsLoaded(true);
         cargar();
     }, [currentPage]);
+
+    useEffect(() => {
+        const dialog = dialogRef.current;
+
+        const handleScrollLock = () => {
+            if (modalAbierto) {
+                document.body.classList.add("overflow-hidden");
+            } else {
+                document.body.classList.remove("overflow-hidden");
+            }
+        };
+
+        const handleClickOutside = (e) => {
+            if (dialog && modalAbierto) {
+                const rect = dialog.getBoundingClientRect();
+                const clickInside =
+                    e.clientX >= rect.left &&
+                    e.clientX <= rect.right &&
+                    e.clientY >= rect.top &&
+                    e.clientY <= rect.bottom;
+
+                if (!clickInside) {
+                    cerrarModal();
+                }
+            }
+        }
+
+        handleScrollLock();
+        window.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.body.classList.remove("overflow-hidden");
+            window.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [modalAbierto]);
 
     const cambiarPagina = (page) => {
         if (page >= 1 && page <= totalPages) {
@@ -234,7 +283,7 @@ const Diario = () => {
                     <dialog
                         ref={dialogRef}
                         className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 w-full max-w-md border shadow-lg backdrop:bg-black/50 transition-all duration-200 ease-out
-                    ${modalVisible ? "animate-popIn" : ""}`}
+                                        ${modalVisible ? "animate-popIn" : ""}`}
                     >
                         <h2 className="text-lg font-bold mb-4">Escribe tu reseña</h2>
                         <textarea

@@ -73,10 +73,14 @@ class usuariosController {
                 return res.status(404).json({ message: "Usuario no encontrado" })
             }
 
-            const usuarioNombre = await Usuario.findOne({ where: { nombre: nombreNuevo } }) 
-            if (usuarioNombre) {
-                return res.status(400).json({ error: "Nombre de Usuario no Disponible. Elija otro" })
+            if(nombreNuevo !== usuarioExiste.nombre){
+                const usuarioNombre = await Usuario.findOne({ where: { nombre: nombreNuevo } }) 
+                if (usuarioNombre) {
+                    return res.status(400).json({ error: "Nombre de Usuario no Disponible. Elija otro" })
+                }
             }
+
+            
 
             let rutaImagen = usuarioExiste.pfp || 'Default_pfp.jpg'
 
