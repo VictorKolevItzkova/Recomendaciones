@@ -81,6 +81,7 @@ const DetallePelicula = () => {
     };
 
     const abrirModal = async () => {
+        if (!usuario) return
         if (!dialogRef.current) return;
 
         try {
