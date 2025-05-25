@@ -14,10 +14,12 @@ import MainLayout from './layouts/MainLayout'
 import NoNavLayout from './layouts/NoNavLayout'
 
 import RutaProtegida from './components/RutaProtegida'
+import ScrollTop from './components/ScrollTop'
 
 const App = () => {
   return (
     <Router>
+      <ScrollTop/>
       <AuthProvider>
         <Routes>
           <Route element={<MainLayout />}>
