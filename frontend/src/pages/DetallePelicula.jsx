@@ -144,6 +144,8 @@ const DetallePelicula = () => {
     };
 
     useEffect(() => {
+        if (usuario === undefined) return;
+
         const inicio = Date.now();
         const delayMinimo = 500;
 
@@ -184,7 +186,7 @@ const DetallePelicula = () => {
 
         setIsLoaded(true)
         fetchData();
-    }, [id]);
+    }, [id,usuario]);
 
 
     useEffect(() => {
